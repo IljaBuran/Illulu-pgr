@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="Illulu/IlluluEditor/IlluluEditor.vcxproj" Id="a5311b32-d07f-4aeb-b583-f8a1b84cd64f" />
+  <Project Path="Illulu/IlluluEditorApp/IlluluEditorApp.vcxproj" Id="b3b237d3-846e-4b5b-968e-0a3ce0fac609" />
+  <Project Path="Illulu/IlluluEngine/IlluluEngine.vcxproj" Id="92602978-8960-49cd-aaf2-b6529d1e7b6b" />
+</Solution>
