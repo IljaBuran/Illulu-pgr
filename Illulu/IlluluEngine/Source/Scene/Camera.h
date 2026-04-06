@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "Common.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -13,8 +15,8 @@ struct Camera
     glm::vec3 right{1.0f, 0.0f, 0.0f};
     glm::vec3 worldUp{0.0f, 1.0f, 0.0f};
 
-    f32 yaw   = -90.0f;
-    f32 pitch = 0.0f;
+    f32 yaw   = -90.0f; // left right
+    f32 pitch = 0.0f; // up down
 
     static constexpr f32 movementSpeed    = 9.0f;
     static constexpr f32 mouseSensitivity = 0.1f;
@@ -70,12 +72,12 @@ struct Camera
     {
         xOffset *= mouseSensitivity;
         yOffset *= mouseSensitivity;
-
         yaw   += xOffset;
         pitch += yOffset;
 
-        if (pitch > 89.0f)  pitch = 89.0f;
-        if (pitch < -89.0f) pitch = -89.0f;
+        pitch = std::clamp(pitch, -89.0f, 89.0f);
+        //if (pitch > 89.0f)  pitch = 89.0f;
+        //if (pitch < -89.0f) pitch = -89.0f;
 
         update();
     }
