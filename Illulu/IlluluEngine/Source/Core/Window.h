@@ -21,8 +21,6 @@ struct Window
     void poll_events() const noexcept;
     void swap_buffers() const noexcept;
 
-    static void message_box(const char* title, const char* body);
-
 private:
 
     static void _callback_framebuffer_size(GLFWwindow* window, i32 width, i32 height) noexcept;

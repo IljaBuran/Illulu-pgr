@@ -1,106 +1,160 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Core">
+    <Filter Include="Source">
+      <UniqueIdentifier>{edf9b711-2f0c-417a-ab4b-44848cf4d62a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core">
       <UniqueIdentifier>{a214e0e0-67ea-4c01-80b9-621f61963482}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer">
-      <UniqueIdentifier>{2d430aa2-09a0-4e9b-a48c-6c7081fe3acd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene">
+    <Filter Include="Source\Scene">
       <UniqueIdentifier>{09d83e5d-cc98-4950-95aa-9b4d6ac61b87}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Precompiled header">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Source\Renderer">
+      <UniqueIdentifier>{2d430aa2-09a0-4e9b-a48c-6c7081fe3acd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{050cfa7d-d665-4bb2-a6f8-79c9b647b772}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Core\Window.h">
-      <Filter>Core</Filter>
+      <Filter>Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\App.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Scene\Camera.h">
-      <Filter>Scene</Filter>
+      <Filter>Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\Object.h">
-      <Filter>Scene</Filter>
+      <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\Scene.h">
-      <Filter>Scene</Filter>
+      <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\Transform.h">
-      <Filter>Scene</Filter>
+      <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\Vertex.h">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\Mesh.h">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\Model.h">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\Renderer.h">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\Shader.h">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\Texture.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\pch.h">
-      <Filter>Precompiled header</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\Debug.h">
-      <Filter>Core</Filter>
+      <Filter>Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\Filesystem.h">
-      <Filter>Core</Filter>
+      <Filter>Source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Core\Input.h" />
-    <ClInclude Include="Source\Core\ILayer.h" />
-    <ClInclude Include="Source\Core\AppContext.h" />
+    <ClInclude Include="Source\Scene\PerspectiveCameraComponent.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\FreeCameraControllerComponent.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\ICameraComponent.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\IComponent.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\AppContext.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\IDrawable.h">
+      <Filter>Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\ModelDrawable.h">
+      <Filter>Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\SkyboxDrawable.h">
+      <Filter>Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\Material.h">
+      <Filter>Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Input.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\pch.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\DirectionalLightComponent.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\ILightComponent.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\PointLightComponent.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\SpotLightComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Renderer\Texture.cpp">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Renderer\Shader.cpp">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Renderer\Renderer.cpp">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Renderer\Model.cpp">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Renderer\Mesh.cpp">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\Window.cpp">
-      <Filter>Core</Filter>
+      <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\App.cpp">
-      <Filter>Core</Filter>
+      <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scene\Scene.cpp">
-      <Filter>Renderer</Filter>
+      <Filter>Source\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Source\pch.cpp">
-      <Filter>Precompiled header</Filter>
+    <ClCompile Include="Source\Core\Debug.cpp">
+      <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\Filesystem.cpp">
-      <Filter>Precompiled header</Filter>
+    <ClCompile Include="Source\Scene\PerspectiveCameraComponent.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\SkyboxDrawable.cpp">
+      <Filter>Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\Object.cpp">
+      <Filter>Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\Input.cpp">
-      <Filter>Precompiled header</Filter>
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Filesystem.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\Material.cpp">
+      <Filter>Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\ModelDrawable.cpp">
+      <Filter>Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\pch.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\ThirdParty\glad\glad.c">
-      <Filter>Precompiled header</Filter>
+      <Filter>ThirdParty</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

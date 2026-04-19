@@ -1,47 +1,45 @@
 #pragma once
 
-#include <memory>
-
 #include "Common.h"
-#include "Core/Window.h"
 #include "Core/AppContext.h"
+#include "Core/Window.h"
+#include "Core/Input.h"
 #include "Renderer/Renderer.h"
 #include "Scene/Scene.h"
-#include "Core/ILayer.h"
-
-struct ILayer;
-
-struct Window;
-struct Renderer;
-struct Scene;
-struct Input;
 
 struct App
 {
     App();
 
-    void init();
+    bool init();
+    void shutdown();
+
     void init_scene();
 
-    i32 run();
-    
-    void push_layer(std::unique_ptr<ILayer> layer);
+    void begin_frame();
+    void update();
+    void render();
+    void end_frame();
 
-    void process_keyboard(f32 deltaTime);
-    void process_mouse();
+    bool should_close() const;
+    f32 get_delta_time() const;
+    AppContext& get_context();
+
+    void close();
 
     Window     window;
     Renderer   renderer;
     Scene      scene;
     Input      input;
     AppContext appContext;
-    
-    std::vector<std::unique_ptr<ILayer>> layers;
 
     bool isRunning = true;
 
     f32 lastFrame = 0.0f;
-    u16 fpsCnter    = 0;
-    f32 lastFpsTime = 0;
-    u16 lastFpsVal  = 0;
+    f32 deltaTime = 0.0f;
+    u16 fpsCnter = 0;
+    f32 lastFpsTime = 0.0f;
+    u16 lastFpsVal = 0;
+
+    bool sceneNotBound = true;
 };

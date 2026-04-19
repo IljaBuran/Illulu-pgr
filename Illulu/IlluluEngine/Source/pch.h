@@ -16,6 +16,10 @@
 #define NOMINMAX
 #endif
 
+#ifndef GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32
+#endif 
+
 #include <Windows.h>
 
 // ==== STL ====
@@ -33,6 +37,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
 // ==== Common ====
 #include "Common.h"

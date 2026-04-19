@@ -1,6 +1,5 @@
 #include "Input.h"
 #include "pch.h"
-#include "Input.h"
 
 void Input::begin_frame()
 {

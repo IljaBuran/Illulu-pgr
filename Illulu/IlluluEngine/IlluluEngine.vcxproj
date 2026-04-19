@@ -45,15 +45,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)\$(Platform)\$(Configuration)\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)\$(Platform)\$(Configuration)\Intermediate\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -61,6 +61,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)Source;$(SolutionDir)Illulu;$(SolutionDir)ThirdParty;$(SolutionDir)ThirdParty\assimp;$(SolutionDir)ThirdParty\glad;$(SolutionDir)ThirdParty\GLFW;$(SolutionDir)ThirdParty\glm;$(SolutionDir)ThirdParty\KHR;$(SolutionDir)ThirdParty\stb</AdditionalIncludeDirectories>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -70,7 +72,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -80,6 +82,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)Source;$(SolutionDir)Illulu;$(SolutionDir)ThirdParty;$(SolutionDir)ThirdParty\assimp;$(SolutionDir)ThirdParty\glad;$(SolutionDir)ThirdParty\GLFW;$(SolutionDir)ThirdParty\glm;$(SolutionDir)ThirdParty\KHR;$(SolutionDir)ThirdParty\stb</AdditionalIncludeDirectories>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -88,29 +92,46 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Renderer\Material.h" />
+    <ClInclude Include="Source\Scene\DirectionalLightComponent.h" />
+    <ClInclude Include="Source\Scene\FreeCameraControllerComponent.h" />
+    <ClInclude Include="Source\Scene\ILightComponent.h" />
+    <ClInclude Include="Source\Scene\PerspectiveCameraComponent.h" />
+    <ClInclude Include="Source\Scene\ICameraComponent.h" />
+    <ClInclude Include="Source\Scene\IComponent.h" />
+    <ClInclude Include="Source\Renderer\SkyboxDrawable.h" />
+    <ClInclude Include="Source\Renderer\ModelDrawable.h" />
     <ClInclude Include="Source\Core\AppContext.h" />
-    <ClInclude Include="Source\Core\ILayer.h" />
     <ClInclude Include="Source\Core\Input.h" />
     <ClInclude Include="Source\Core\Filesystem.h" />
     <ClInclude Include="Source\Core\App.h" />
     <ClInclude Include="Source\Core\Debug.h" />
     <ClInclude Include="Source\Core\Window.h" />
     <ClInclude Include="Source\pch.h" />
+    <ClInclude Include="Source\Renderer\IDrawable.h" />
     <ClInclude Include="Source\Renderer\Mesh.h" />
     <ClInclude Include="Source\Renderer\Model.h" />
     <ClInclude Include="Source\Renderer\Renderer.h" />
     <ClInclude Include="Source\Renderer\Shader.h" />
     <ClInclude Include="Source\Renderer\Texture.h" />
     <ClInclude Include="Source\Renderer\Vertex.h" />
-    <ClInclude Include="Source\Scene\Camera.h" />
     <ClInclude Include="Source\Scene\Object.h" />
+    <ClInclude Include="Source\Scene\PointLightComponent.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
+    <ClInclude Include="Source\Scene\SpotLightComponent.h" />
     <ClInclude Include="Source\Scene\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ThirdParty\glad\glad.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Renderer\Material.cpp" />
+    <ClCompile Include="Source\Core\Debug.cpp" />
+    <ClCompile Include="Source\Scene\Object.cpp" />
+    <ClCompile Include="Source\Scene\PerspectiveCameraComponent.cpp" />
+    <ClCompile Include="Source\Renderer\SkyboxDrawable.cpp" />
+    <ClCompile Include="Source\Renderer\ModelDrawable.cpp" />
     <ClCompile Include="Source\Core\Input.cpp" />
     <ClCompile Include="Source\Core\Filesystem.cpp" />
     <ClCompile Include="Source\Core\App.cpp" />

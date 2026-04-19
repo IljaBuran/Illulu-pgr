@@ -5,69 +5,31 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
+#include <memory>
+
+#include "Renderer/IDrawable.h"
+#include "Renderer/ModelDrawable.h"
+#include "Renderer/SkyboxDrawable.h"
+#include "Scene/PerspectiveCameraComponent.h"
+#include "Scene/DirectionalLightComponent.h"
+#include "Scene/PointLightComponent.h"
+#include "Scene/SpotLightComponent.h"
+#include "Core/Window.h"
+#include "Core/Debug.h"
 
 void Scene::add_model(Model&& model)
 {
-    auto it = std::find_if(models.begin(), models.end(),
-        [&](const Model& m) { return m.name == model.name; });
-
-    if (it != models.end())
-    {
-        Window::message_box("ModelManager", "Model couldn't be added, it is already in the vector");
-        return;
-    }
-
     models.push_back(std::move(model));
 }
 
-u32 Scene::find_model(const std::string& name) const
+void Scene::remove_model(u32 idx)
 {
-    for (u32 i = 0; i < models.size(); ++i)
-    {
-        if (models[i].name == name)
-            return i;
-    }
-
-    return static_cast<u32>(-1);
-}
-
-void Scene::remove_model(const std::string& modelName)
-{
-    auto it = std::find_if(models.begin(), models.end(),
-        [&](const Model& m) { return m.name == modelName; });
-
-    if (it == models.end())
-    {
-        Window::message_box("ModelManager", "Model couldn't be deleted, it's not in the vector");
-        return;
-    }
-
-    models.erase(it);
+    models.erase(models.begin() + idx);
 }
 
 void Scene::add_object(Object&& object)
 {
-    auto it = std::find_if(objects.begin(), objects.end(),
-        [&](const Object& o) { return o.name == object.name; });
-
-    if (it != objects.end())
-    {
-        Window::message_box("ObjectManager", "Object couldn't be added, it is already in the vector");
-        return;
-    }
-
     objects.push_back(std::move(object));
-}
-
-u32 Scene::find_object(const std::string& name) const
-{
-    for (u32 i = 0; i < objects.size(); ++i)
-    {
-        if (objects[i].name == name)
-            return i;
-    }
-
-    return static_cast<u32>(-1);
 }
 
 void Scene::rename_object(u32 idx, const std::string& newName)
@@ -75,52 +37,100 @@ void Scene::rename_object(u32 idx, const std::string& newName)
     objects[idx].name = newName;
 }
 
-void Scene::remove_object(const std::string& objectName)
+void Scene::duplicate_object(u32 idx)
 {
-    auto it = std::find_if(objects.begin(), objects.end(),
-        [&](const Object& o) { return o.name == objectName; });
-
-    if (it == objects.end())
-    {
-        Window::message_box("ObjectManager", "Object couldn't be deleted, it's not in the vector");
+    if (idx >= objects.size())
         return;
+
+    Object copy;
+    copy.name = objects[idx].name + "_copy";
+    copy.transform = objects[idx].transform;
+
+    std::vector<std::unique_ptr<IComponent>> clonedComponents;
+    clonedComponents.reserve(objects[idx].components.size());
+
+    for (const auto& comp : objects[idx].components)
+    {
+        clonedComponents.push_back(comp->clone());
     }
 
-    objects.erase(it);
-}
+    add_object(std::move(copy));
+    u32 newIdx = static_cast<u32>(objects.size() - 1);
 
-void Scene::add_camera(Camera&& camera = Camera())
-{
-    cameras.push_back(std::move(camera));
-}
-
-void Scene::rename_camera(u32 camIdx, const std::string& newName)
-{
-    cameras[currentCameraIdx].name = newName;
-}
-
-void Scene::remove_camera(u32 idx)
-{
-    if (idx >= cameras.size())
+    for (auto& comp : clonedComponents)
     {
-        Window::message_box("SceneManager", "Trying to remove camera with invalid idx");
-        return;
+        add_object_component(newIdx, std::move(comp));
     }
-    if (cameras.size() == 1)
+}
+
+bool Scene::remove_object(u32 idx)
+{
+    if (idx >= objects.size())
+        return false;
+
+    // todo(ilja): temporary solution
+    if (idx == currentCamera.objectIdx)
     {
-        Window::message_box("SceneManager", "Trying to remove last camera in the scene");
-        return;
+        message_box("Editor", "Can't remove currently active camera").pop_up();
+        return false;
     }
 
-    if (currentCameraIdx == 0)
-        currentCameraIdx++;
-    else
-        currentCameraIdx--;
+    const bool deletedCurrentCameraObject = (currentCamera.objectIdx == idx);
 
-    cameras.erase(cameras.begin() + idx);
+    objects.erase(objects.begin() + idx);
+
+    for (u32 i = 0; i < cachedCameras.size(); i++)
+    {
+        if (cachedCameras[i].objectIdx == idx)
+        {
+            cachedCameras.erase(cachedCameras.begin() + i);
+            i--;
+        }
+        else if (cachedCameras[i].objectIdx > idx)
+        {
+            cachedCameras[i].objectIdx--;
+        }
+    }
+
+    for (u32 i = 0; i < cachedDrawables.size(); i++)
+    {
+        if (cachedDrawables[i].objectIdx == idx)
+        {
+            cachedDrawables.erase(cachedDrawables.begin() + i);
+            i--;
+        }
+        else if (cachedDrawables[i].objectIdx > idx)
+        {
+            cachedDrawables[i].objectIdx--;
+        }
+    }
+    
+    for (u32 i = 0; i < cachedLights.size(); i++)
+    {
+        if (cachedLights[i].objectIdx == idx)
+        {
+            cachedLights.erase(cachedLights.begin() + i);
+            i--;
+        }
+        else if (cachedLights[i].objectIdx > idx)
+        {
+            cachedLights[i].objectIdx--;
+        }
+    }
+
+    if (deletedCurrentCameraObject)
+    {
+        if (!cachedCameras.empty())
+            currentCamera = cachedCameras[0];
+        else
+            currentCamera = {};
+    }
+    else if (currentCamera.objectIdx > idx)
+    {
+        currentCamera.objectIdx--;
+    }
+    return true;
 }
-
-
 
 void Scene::update()
 {
@@ -130,27 +140,23 @@ void Scene::update()
 // todo(ilja): this shit will be slow for bigger scenes, just redo later in binary format
 void Scene::load_from_file(const std::string& path)
 {
-
     std::ifstream ifs(path);
     if (!ifs)
     {
-        Window::message_box("SceneLoader::load_from_file", "Invalid Path!");
+        message_box("Scene::load_from_file", "Invalid path!").pop_up();
         return;
     }
 
     objects.clear();
     models.clear();
-    cameras.clear();
-    currentCameraIdx = 0;
+    currentCamera = {};
 
     auto lGet = [&]() -> std::string
     {
         std::string s;
         ifs >> s;
-
         if (!ifs)
             FATAL_CRASH("[SceneLoader]: Unexpected EOF");
-
         return s;
     };
 
@@ -158,6 +164,8 @@ void Scene::load_from_file(const std::string& path)
     {
         std::string token;
         ifs >> token;
+        if (!ifs)
+            break;
 
         if (token == "[scene]")
         {
@@ -165,41 +173,118 @@ void Scene::load_from_file(const std::string& path)
         }
         else if (token == "[model]")
         {
-           add_model(Model(ModelLoader(lGet().c_str())));
+            add_model(Model(ModelLoader(lGet().c_str())));
         }
         else if (token == "[object]")
         {
             Object obj;
             obj.name = lGet();
-            obj.modelIdx = std::stoul(lGet());
+
             obj.transform.position = {std::stof(lGet()), std::stof(lGet()), std::stof(lGet())};
             obj.transform.rotation = {std::stof(lGet()), std::stof(lGet()), std::stof(lGet())};
             obj.transform.scale = {std::stof(lGet()), std::stof(lGet()), std::stof(lGet())};
-            obj.color = {std::stof(lGet()), std::stof(lGet()), std::stof(lGet())};
 
+            u32 componentCount = std::stoul(lGet());
             add_object(std::move(obj));
-        }
-        else if (token == "[camera]")
-        {
-            Camera cam;
-            cam.name = lGet();
-            cam.position = {std::stof(lGet()), std::stof(lGet()), std::stof(lGet())};
-            cam.front = {std::stof(lGet()), std::stof(lGet()), std::stof(lGet())};
-            cam.up = {std::stof(lGet()), std::stof(lGet()), std::stof(lGet())};
-            cam.right = {std::stof(lGet()), std::stof(lGet()), std::stof(lGet())};
-            cam.worldUp = {std::stof(lGet()), std::stof(lGet()), std::stof(lGet())};
-            cam.yaw = std::stof(lGet());
-            cam.pitch = std::stof(lGet());
+            u32 objectIdx = static_cast<u32>(objects.size() - 1);
 
-            add_camera(std::move(cam));
+            for (u32 i = 0; i < componentCount; i++)
+            {
+                std::string compToken = lGet();
+                if (compToken != "[component]")
+                    FATAL_CRASH("[SceneLoader]: Expected [component]");
+
+                ComponentKind kind = component_kind_from_string(lGet());
+
+                switch (kind)
+                {
+                case ComponentKind::DrawableModel:
+                {
+                    u32 modelIdx = std::stoul(lGet());
+                    Color color = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+                    add_object_component<ModelDrawable>(objectIdx, modelIdx, color);
+                    break;
+                }
+
+                case ComponentKind::DrawableSkybox:
+                {
+                    std::array<std::string, 6> faces = {
+                        lGet(), lGet(), lGet(), lGet(), lGet(), lGet()
+                    };
+                    add_object_component<SkyboxDrawable>(objectIdx, faces);
+                    break;
+                }
+
+                case ComponentKind::PerspectiveCamera:
+                {
+                    f32 yaw = std::stof(lGet());
+                    f32 pitch = std::stof(lGet());
+                    glm::vec3 worldUp = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+                    add_object_component<PerspectiveCameraComponent>(objectIdx, yaw, pitch, worldUp);
+                    break;
+                }
+
+
+                case ComponentKind::FreeCameraController:
+                {
+                    FATAL_CRASH("NOT IMPLEMENTED");
+                }
+
+                case ComponentKind::DirectionalLight:
+                {
+                    glm::vec3 color = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+
+                    f32 intensity = std::stof(lGet());
+
+                    add_object_component<DirectionalLightComponent>(objectIdx, color, intensity);
+                    break;
+                }
+
+                case ComponentKind::PointLight:
+                {
+                    glm::vec3 color = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+                    f32 intensity = std::stof(lGet());
+                    f32 constant = std::stof(lGet());
+                    f32 linear = std::stof(lGet());
+                    f32 quadratic = std::stof(lGet());
+
+                    add_object_component<PointLightComponent>(objectIdx, color, intensity, constant, linear, quadratic);
+                    break;
+                }
+
+                case ComponentKind::SpotLight:
+                {
+                    FATAL_CRASH("[SceneLoader]:Spotlight is not yet implemented");
+                    break;
+                }
+
+                default:
+                FATAL_CRASH("[SceneLoader]: Unsupported component kind");
+                }
+            }
         }
         else if (token == "[current_camera]")
         {
-            currentCameraIdx = std::stoul(lGet());
+            currentCamera = {std::stoul(lGet()), std::stoul(lGet())};
         }
         else if (token == "[end]")
         {
-            _check_camera();
             return;
         }
         else
@@ -210,6 +295,7 @@ void Scene::load_from_file(const std::string& path)
             FATAL_CRASH(errorMsg.c_str());
         }
     }
+
     FATAL_CRASH("[SceneLoader]: [end] not found");
 }
 
@@ -218,71 +304,134 @@ void Scene::save_to_file(const std::string& path)
     std::ofstream ofs(path);
     if (!ofs)
     {
-        Window::message_box("SceneLoader::save_to_file", "Invalid Path!");
+        message_box("Scene::save_to_file", "Invalid path!").pop_up();
         return;
     }
-
 
     ofs << "[scene]\n" << name << "\n\n";
 
     for (const Model& model : models)
-        ofs << "[model]\n" << model.sourcePath << "\n\n";
+    {
+        ofs << "[model]\n";
+        ofs << model.sourcePath << "\n\n";
+    }
 
     for (const Object& object : objects)
     {
-        ofs << "[object]\n"
-        << object.name << '\n'
-        << object.modelIdx << '\n'
-        << object.transform.position.x << ' '
-        << object.transform.position.y << ' '
-        << object.transform.position.z << '\n'
-        << object.transform.rotation.x << ' '
-        << object.transform.rotation.y << ' '
-        << object.transform.rotation.z << '\n'
-        << object.transform.scale.x << ' '
-        << object.transform.scale.y << ' '
-        << object.transform.scale.z << '\n'
-        << object.color.x << ' '
-        << object.color.y << ' '
-        << object.color.z << "\n\n";
+        ofs << "[object]\n";
+        ofs << object.name << '\n';
+
+        ofs << object.transform.position.x << ' '
+            << object.transform.position.y << ' '
+            << object.transform.position.z << '\n';
+
+        ofs << object.transform.rotation.x << ' '
+            << object.transform.rotation.y << ' '
+            << object.transform.rotation.z << '\n';
+
+        ofs << object.transform.scale.x << ' '
+            << object.transform.scale.y << ' '
+            << object.transform.scale.z << '\n';
+
+        ofs << object.components.size() << '\n';
+
+        for (const auto& comp : object.components)
+        {
+            ofs << "[component]\n";
+            ofs << component_kind_to_string(comp->get_component_kind()) << '\n';
+
+            switch (comp->get_component_kind())
+            {
+                case ComponentKind::DrawableModel:
+                {
+                    const auto* md = static_cast<const ModelDrawable*>(comp.get());
+                    ofs << md->modelIdx << '\n';
+                    ofs << md->color.x << ' '
+                        << md->color.y << ' '
+                        << md->color.z << '\n';
+                    break;
+                }
+
+                case ComponentKind::DrawableSkybox:
+                {
+                    const auto* sd = static_cast<const SkyboxDrawable*>(comp.get());
+                    for (const std::string& face : sd->faces)
+                        ofs << face << '\n';
+                    break;
+                }
+
+                case ComponentKind::PerspectiveCamera:
+                {
+                    const auto* cam = static_cast<const PerspectiveCameraComponent*>(comp.get());
+                    ofs << cam->yaw << '\n';
+                    ofs << cam->pitch << '\n';
+                    ofs << cam->worldUp.x << ' '
+                        << cam->worldUp.y << ' '
+                        << cam->worldUp.z << '\n';
+                    break;
+                }
+
+                case ComponentKind::DirectionalLight:
+                {
+                    const auto* light = static_cast<const DirectionalLightComponent*>(comp.get());
+                    
+                    ofs << light->color.x << ' '
+                        << light->color.y << ' '
+                        << light->color.z << '\n';
+
+                    ofs << light->intensity << '\n';
+                    break;
+                }
+
+                case ComponentKind::PointLight:
+                {
+                    const auto* light = static_cast<const PointLightComponent*>(comp.get());
+                    ofs << light->color.x << ' '
+                        << light->color.y << ' '
+                        << light->color.z << '\n';
+                    ofs << light->intensity << '\n';
+                    ofs << light->constant << '\n';
+                    ofs << light->linear << '\n';
+                    ofs << light->quadratic << '\n';
+                    break;
+                }
+
+                case ComponentKind::SpotLight:
+                {
+                    FATAL_CRASH("[SceneLoader]:Spotlight is not yet implemented");
+                    break;
+                }
+
+                default:
+                    FATAL_CRASH("[Scene::save_to_file]: Unsupported component kind");
+            }
+        }
+
+        ofs << '\n';
     }
 
-    for (const Camera& camera : cameras)
-    {
-        ofs << "[camera]\n"
-            << camera.name << '\n'
-            << camera.position.x << ' '
-            << camera.position.y << ' '
-            << camera.position.z << '\n'
-            << camera.front.x << ' '
-            << camera.front.y << ' '
-            << camera.front.z << '\n'
-            << camera.up.x << ' '
-            << camera.up.y << ' '
-            << camera.up.z << '\n'
-            << camera.right.x << ' '
-            << camera.right.y << ' '
-            << camera.right.z << '\n'
-            << camera.worldUp.x << ' '
-            << camera.worldUp.y << ' '
-            << camera.worldUp.z << '\n'
-            << camera.yaw << '\n'
-            << camera.pitch << "\n\n";
-    }
+    ofs << "[current_camera]\n";
+    ofs << currentCamera.objectIdx << ' ' << currentCamera.componentIdx << "\n\n";
 
-    ofs << "[current_camera]\n" << currentCameraIdx << "\n\n";
     ofs << "[end]\n";
-
-    Window::message_box("SceneLoader", "Saved successfully");
 }
 
-void Scene::_check_camera()
+Object* Scene::get_current_camera_object()
 {
-    if (!cameras.empty())
-        return;
+    return &objects[currentCamera.objectIdx];
+}
 
-    Window::message_box("SceneManager", "Camera not found in scene, creating default one!");
+const Object* Scene::get_current_camera_object() const
+{
+    return &objects[currentCamera.objectIdx];
+}
 
-    cameras.emplace_back(Camera());
-    currentCameraIdx = 0;
+ICameraComponent* Scene::get_current_camera_component()
+{
+    return reinterpret_cast<ICameraComponent*>(objects[currentCamera.objectIdx].components[currentCamera.componentIdx].get());
+}
+
+const ICameraComponent* Scene::get_current_camera_component() const
+{
+    return reinterpret_cast<const ICameraComponent*>(objects[currentCamera.objectIdx].components[currentCamera.componentIdx].get());
 }

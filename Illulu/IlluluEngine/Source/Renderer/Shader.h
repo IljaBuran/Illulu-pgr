@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <vector>
+#include <numeric>
 
 #include "Common.h"
 
@@ -9,7 +10,7 @@
 struct Shader
 {
     std::vector<GLuint> compiledShaders{};
-    u32 shaderProgram = -1;
+    u32 shaderProgram = std::numeric_limits<u32>::max();
 
     enum class TYPE
     {

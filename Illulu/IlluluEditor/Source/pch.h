@@ -7,6 +7,21 @@
 #ifndef PCH_H
 #define PCH_H
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#ifndef GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32
+#endif
+
+#include <Windows.h>
+
+
 // ==== OpenGL& GLFW ====
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -16,7 +31,14 @@
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
+// ==== NativeFileDialog ====
+#include "nativefiledialog/nfd.hpp"
+#include "nativefiledialog/nfd_glfw3.h"
+
+// ==== stb ====
+
 // ==== Common ====
 #include "Common.h"
+
 
 #endif //PCH_H

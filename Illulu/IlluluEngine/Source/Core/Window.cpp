@@ -4,7 +4,7 @@
 #include "Core/App.h"
 
 Window::Window(const char* name, i32 width, i32 height) noexcept
-{
+{       
     if (!glfwInit())
         FATAL_CRASH("GLFW failed to initialize!");
 
@@ -13,7 +13,7 @@ Window::Window(const char* name, i32 width, i32 height) noexcept
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    window = glfwCreateWindow(width, height, "Renderer", NULL, NULL);
+    window = glfwCreateWindow(width, height, name, NULL, NULL);
     if (!window)
         FATAL_CRASH("GLFW failed to create window!");
 
@@ -53,17 +53,14 @@ void Window::swap_buffers() const noexcept
     glfwSwapBuffers(window);
 }
 
-void Window::message_box(const char* title, const char* body)
-{
-    MessageBoxExA(NULL, body, title, MB_OK, LANG_NEUTRAL);
-}
 
-void Window::_callback_framebuffer_size(GLFWwindow* window, i32 width, i32 height) noexcept
+
+void Window::_callback_framebuffer_size([[maybe_unused]] GLFWwindow* window, i32 width, i32 height) noexcept
 {
     glViewport(0, 0, width, height);
 }
 
-void Window::_callback_keyboard(GLFWwindow* glfwWindow, i32 key, int scancode, int action, int mods) noexcept
+void Window::_callback_keyboard(GLFWwindow* glfwWindow, i32 key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) noexcept
 {
     Window* self = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
     if (!self || !self->input)

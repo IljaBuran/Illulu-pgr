@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Common.h"
-
 #include "Renderer/Mesh.h"
+#include "Renderer/Material.h"
 
 #include <assimp/Importer.hpp>
-
 #include <assimp/scene.h>
 #include <assimp/mesh.h>
+
 
 #include <unordered_map>
 #include <string>
@@ -36,7 +36,11 @@ struct ModelLoader
 
 private:
 
-    u32  load_material_diffuse_texture(aiMaterial* material);
+    static bool image_has_alpha(const std::string& path);
+    static std::string get_material_texture_path(const std::string& modelPath, aiMaterial* material, aiTextureType type);
+
+    u32  load_material_texture(aiMaterial* material, aiTextureType type);
     Mesh process_mesh(aiMesh* mesh);
+    Material load_material(aiMaterial* material);
     void process_node(aiNode* node);
 };

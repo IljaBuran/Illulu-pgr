@@ -1,7 +1,8 @@
 #pragma once
 
+#include "Common.h"
 #include "Renderer/Vertex.h"
-
+#include "Renderer/Material.h"
 #include <vector>
 
 struct Mesh
@@ -11,9 +12,12 @@ struct Mesh
     u32 ebo = 0;
     i32 indexCount = 0;
 
-    u32 diffuseTexture = 0;
+    Material material{};
 
-    Mesh(const std::vector<Vertex>& vertices, const std::vector<u32>& indices, u32 diffuseTexture);
+    Mesh(const std::vector<Vertex>& vertices, 
+         const std::vector<u32>&    indices, 
+         const Material&            material_);
+    
     ~Mesh();
 
     Mesh(Mesh&& other)            noexcept;

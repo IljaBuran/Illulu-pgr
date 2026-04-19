@@ -1,40 +1,95 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
+    <Filter Include="Source">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{77c5e235-cb87-4c84-8f28-4651cf50c83c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\EditorLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\pch.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Source\MenuBarPanel.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\InspectorPanel.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\InfoPanel.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\IEditorPanel.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\HierarchyPanel.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EditorState.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EditorApp.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AssetPanel.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\EditorLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\pch.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ThirdParty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="..\..\ThirdParty\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\ThirdParty\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\ThirdParty\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\ThirdParty\imgui\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\..\ThirdParty\imgui\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\..\ThirdParty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Source\MenuBarPanel.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\HierarchyPanel.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\InspectorPanel.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\InfoPanel.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EditorApp.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdParty\imgui\imgui.cpp">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdParty\imgui\imgui_demo.cpp">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdParty\imgui\imgui_draw.cpp">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdParty\imgui\backends\imgui_impl_glfw.cpp">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdParty\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdParty\imgui\imgui_tables.cpp">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdParty\imgui\imgui_widgets.cpp">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\AssetPanel.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="IlluluEditor.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Resources\Icons\editor_icon.ico" />
   </ItemGroup>
 </Project>

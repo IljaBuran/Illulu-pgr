@@ -5,9 +5,9 @@
 #include <cstddef>
 #include <glad/glad.h>
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<u32>& indices, u32 diffuseTexture_)
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<u32>& indices, const Material& material_)
+    : material(material_)
 {
-    diffuseTexture = diffuseTexture_;
     indexCount = (i32)indices.size();
 
     glGenVertexArrays(1, &vao);
@@ -58,13 +58,13 @@ Mesh::Mesh(Mesh&& other) noexcept
         vbo = other.vbo;
         ebo = other.ebo;
         indexCount = other.indexCount;
-        diffuseTexture = other.diffuseTexture;
+        material = other.material;
 
         other.vao = 0;
         other.vbo = 0;
         other.ebo = 0;
         other.indexCount = 0;
-        other.diffuseTexture = 0;
+        other.material = {};
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept
@@ -77,13 +77,13 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept
         vbo = other.vbo;
         ebo = other.ebo;
         indexCount = other.indexCount;
-        diffuseTexture = other.diffuseTexture;
+        material = other.material;
 
         other.vao = 0;
         other.vbo = 0;
         other.ebo = 0;
         other.indexCount = 0;
-        other.diffuseTexture = 0;
+        other.material = {};
     }
 
     return *this;
@@ -115,5 +115,5 @@ void Mesh::destroy()
     vbo = 0;
     ebo = 0;
     indexCount = 0;
-    diffuseTexture = 0;
+    material = {};
 }
