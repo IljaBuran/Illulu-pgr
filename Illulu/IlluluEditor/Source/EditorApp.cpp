@@ -48,6 +48,9 @@ bool EditorApp::init()
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
 
+    io.ConfigDpiScaleFonts = true;
+    io.ConfigDpiScaleViewports = true;
+
     ImGui_ImplGlfw_InitForOpenGL(ctx.pWindow->window, true);
     ImGui_ImplOpenGL3_Init();
 
