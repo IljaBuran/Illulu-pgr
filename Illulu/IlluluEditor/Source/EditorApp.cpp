@@ -48,6 +48,9 @@ bool EditorApp::init()
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
 
+    static std::string imguiLayoutPath = "Resources/Editor/imgui_layout.ini";
+    io.IniFilename = imguiLayoutPath.c_str();
+
     io.ConfigDpiScaleFonts = true;
     io.ConfigDpiScaleViewports = true;
 
