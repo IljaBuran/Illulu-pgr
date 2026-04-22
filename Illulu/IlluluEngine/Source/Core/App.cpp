@@ -106,7 +106,7 @@ void App::init_scene()
 {
     #if _DEBUG
         scene.load_from_file("Resources/Scenes/semestral.ill");
-    #elif
-    scene.load_from_file("Resources/Scenes/starter.ill");
+    #else
+        scene.load_from_file("Resources/Scenes/starter.ill");
     #endif
 }
