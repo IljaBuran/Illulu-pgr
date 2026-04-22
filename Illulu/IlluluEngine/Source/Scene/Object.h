@@ -31,6 +31,7 @@ struct Object
         return *static_cast<T*>(components.back().get());
     }
 
+    // todo(ilja): this has no usage rn
     template<typename T>
     T* get_component()
     {
