@@ -150,8 +150,11 @@ void EditorApp::update(f32 deltaTime)
     glm::vec3 front = cam->get_front();
     glm::vec3 right = glm::normalize(glm::cross(front, cam->worldUp));
 
-    constexpr f32 movementSpeed = 9.0f;
+    f32 movementSpeed = 9.0f;
     constexpr f32 mouseSensitivity = 0.1f;
+
+    if (input.is_key_down(GLFW_KEY_LEFT_SHIFT))
+        movementSpeed *= 2;
 
     if (input.is_key_down(GLFW_KEY_W))
         camObj.transform.position += front * movementSpeed * deltaTime;
