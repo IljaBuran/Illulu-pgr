@@ -60,6 +60,38 @@ void Renderer::init()
         handles.pointLightQuadratics[i] =
             shader.get_uniform_location(("pointLightQuadratics[" + std::to_string(i) + "]").c_str());
     }
+
+    handles.spotLightCount = shader.get_uniform_location("spotLightCount");
+
+    for (i32 i = 0; i < MAX_SPOT_LIGHTS; i++)
+    {
+        handles.spotLightPositions[i] = 
+            shader.get_uniform_location(("spotLightPositions[" + std::to_string(i) + "]").c_str());
+
+        handles.spotLightDirections[i] = 
+            shader.get_uniform_location(("spotLightDirections[" + std::to_string(i) + "]").c_str());
+        
+        handles.spotLightColors[i] = 
+            shader.get_uniform_location(("spotLightColors[" + std::to_string(i) + "]").c_str());
+        
+        handles.spotLightIntensities[i] = 
+            shader.get_uniform_location(("spotLightIntensities[" + std::to_string(i) + "]").c_str());
+        
+        handles.spotLightInnerCutoffCos[i] = 
+            shader.get_uniform_location(("spotLightInnerCutoffCos[" + std::to_string(i) + "]").c_str());
+        
+        handles.spotLightOuterCutoffCos[i] = 
+            shader.get_uniform_location(("spotLightOuterCutoffCos[" + std::to_string(i) + "]").c_str());
+        
+        handles.spotLightConstants[i] = 
+            shader.get_uniform_location(("spotLightConstants[" + std::to_string(i) + "]").c_str());
+        
+        handles.spotLightLinears[i] = 
+            shader.get_uniform_location(("spotLightLinears[" + std::to_string(i) + "]").c_str());
+        
+        handles.spotLightQuadratics[i] = 
+            shader.get_uniform_location(("spotLightQuadratics[" + std::to_string(i) + "]").c_str());
+    }
     
     handles.viewPos = shader.get_uniform_location("viewPos");
     handles.ambientStrength = shader.get_uniform_location("ambientStrength");
@@ -95,7 +127,7 @@ void Renderer::begin_frame()
     glm::vec3 col;
     f32 intens = 1.0f;
 
-    if (get_main_directional_light(dir, col, intens))
+    if (get_directional_light(dir, col, intens))
     {
         glUniform3fv(handles.dirLightDirection, 1, glm::value_ptr(dir));
         glUniform3fv(handles.dirLightColor, 1, glm::value_ptr(col));
@@ -111,7 +143,9 @@ void Renderer::begin_frame()
         glUniform1f(handles.dirLightIntensity, 1.0f);
     }
 
+    // todo(ilja): inefficient, redo later
     upload_point_lights();
+    upload_spot_lights();
 }
 
 void Renderer::bind_scene(const Scene& scene)
@@ -255,13 +289,13 @@ void Renderer::draw_skybox(u32 cubemapTexture, u32 vao)
         FATAL_CRASH("[RENDERER]: Current camera object/component missing");
 
     glm::mat4 view = glm::mat4(glm::mat3(cam->get_view_matrix(camObj->transform)));
-    glm::mat4 vp = projection * view;
+    glm::mat4 PV = cam->get_projection_matrix(get_aspect_ratio()) * view;
 
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
 
     skyboxShader.use();
-    glUniformMatrix4fv(skyboxHandles.VP, 1, GL_FALSE, glm::value_ptr(vp));
+    glUniformMatrix4fv(skyboxHandles.VP, 1, GL_FALSE, glm::value_ptr(PV));
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
@@ -292,6 +326,11 @@ glm::vec3 Renderer::get_object_forward_x(const Transform& transform) const
     return glm::normalize(worldForward);
 }
 
+f32 Renderer::get_aspect_ratio() const
+{
+    return static_cast<f32>(appContext->pWindow->width) / static_cast<f32>(appContext->pWindow->height);
+}
+
 glm::mat4 Renderer::build_model_matrix(const Transform& transform) const
 {
     glm::mat4 model(1.0f);
@@ -315,7 +354,7 @@ glm::mat4 Renderer::build_pvm(const Transform& transform) const
 
     glm::mat4 model = build_model_matrix(transform);
     glm::mat4 view = cam->get_view_matrix(camObj->transform);
-    return projection * view * model;
+    return cam->get_projection_matrix(get_aspect_ratio()) * view * model;
 }
 
 void Renderer::apply_material(const Material& material) const
@@ -346,7 +385,7 @@ glm::vec3 Renderer::get_camera_world_position() const
     return camObj->transform.position;
 }
 
-bool Renderer::get_main_directional_light(glm::vec3& outDir, glm::vec3& outColor, f32& outIntensity) const
+bool Renderer::get_directional_light(glm::vec3& outDir, glm::vec3& outColor, f32& outIntensity) const
 {
     if (!pScene)
         return false;
@@ -404,4 +443,46 @@ void Renderer::upload_point_lights() const
     }
 
     glUniform1i(handles.pointLightCount, count);
+}
+
+void Renderer::upload_spot_lights() const
+{
+    if (!pScene)
+    {
+        glUniform1i(handles.spotLightCount, 0);
+        return;
+    }
+
+    i32 count = 0;
+
+    for (const ComponentRef& ref : pScene->cachedLights)
+    {
+        if (count >= MAX_SPOT_LIGHTS)
+        {
+            break;
+        }
+
+        const Object& obj = pScene->objects[ref.objectIdx];
+        const IComponent* comp = obj.components[ref.componentIdx].get();
+
+        if (comp->get_component_kind() != ComponentKind::SpotLight)
+            continue;
+
+        const SpotLightComponent* light = static_cast<const SpotLightComponent*>(comp);
+        glm::vec3 direction = get_object_forward_x(obj.transform);
+
+        glUniform3fv(handles.spotLightPositions[count], 1, glm::value_ptr(obj.transform.position));
+        glUniform3fv(handles.spotLightDirections[count], 1, glm::value_ptr(direction));
+        glUniform3fv(handles.spotLightColors[count], 1, glm::value_ptr(light->color));
+        glUniform1f(handles.spotLightIntensities[count], light->intensity);
+        glUniform1f(handles.spotLightInnerCutoffCos[count], glm::cos(glm::radians(light->innerCutoffDeg)));
+        glUniform1f(handles.spotLightOuterCutoffCos[count], glm::cos(glm::radians(light->outerCutoffDeg)));
+        glUniform1f(handles.spotLightConstants[count], light->constant);
+        glUniform1f(handles.spotLightLinears[count], light->linear);
+        glUniform1f(handles.spotLightQuadratics[count], light->quadratic);
+
+        count++;
+    }
+
+    glUniform1i(handles.spotLightCount, count);
 }

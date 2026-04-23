@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Common.h"
+
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
@@ -7,6 +9,9 @@
 #include "Scene/Scene.h"
 #include "Scene/Object.h"
 #include "Scene/Transform.h"
+
+// todo(ilja): decide
+#include "Core/AppContext.h"
 
 using Color = glm::vec3;
 
@@ -20,6 +25,7 @@ struct RenderItem
 };
 
 static constexpr i32 MAX_POINT_LIGHTS = 8;
+static constexpr i32 MAX_SPOT_LIGHTS = 16;
 
 struct RendererHandles
 {
@@ -53,6 +59,18 @@ struct RendererHandles
     i32 pointLightLinears[MAX_POINT_LIGHTS];
     i32 pointLightQuadratics[MAX_POINT_LIGHTS];
 
+    i32 spotLightCount = -1;
+
+    i32 spotLightPositions[MAX_SPOT_LIGHTS];
+    i32 spotLightDirections[MAX_SPOT_LIGHTS];
+    i32 spotLightColors[MAX_SPOT_LIGHTS];
+    i32 spotLightIntensities[MAX_SPOT_LIGHTS];
+    i32 spotLightInnerCutoffCos[MAX_SPOT_LIGHTS];
+    i32 spotLightOuterCutoffCos[MAX_SPOT_LIGHTS];
+    i32 spotLightConstants[MAX_SPOT_LIGHTS];
+    i32 spotLightLinears[MAX_SPOT_LIGHTS];
+    i32 spotLightQuadratics[MAX_SPOT_LIGHTS];
+    
     i32 viewPos = -1;
     i32 ambientStrength = -1;
 };
@@ -80,17 +98,20 @@ struct Renderer
     void draw_model(u32 modelIdx, const Color& color, const Transform& transform);
     void draw_skybox(u32 cubemapTexture, u32 vao);
 
+    // todo(ilja): decide
+    AppContext* appContext;
 private:
     const Scene* pScene = nullptr;
+
+    f32 get_aspect_ratio() const;
 
     glm::mat4 build_model_matrix(const Transform& transform) const;
     glm::mat4 build_pvm(const Transform& transform) const;
     void apply_material(const Material& material) const;
     glm::vec3 get_camera_world_position() const;
 
-    bool get_main_directional_light(glm::vec3& outDir, glm::vec3& outColor, f32& outIntensity) const;
+    bool get_directional_light(glm::vec3& outDir, glm::vec3& outColor, f32& outIntensity) const;
     void upload_point_lights() const;
+    void upload_spot_lights() const;
     glm::vec3 get_object_forward_x(const Transform& transform) const;
-
-    glm::mat4 projection = glm::perspective(glm::radians(75.0f), 1920.0f / 1080.0f, 0.1f, 180.0f);
 };

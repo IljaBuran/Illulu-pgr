@@ -100,6 +100,7 @@
       <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\SpotLightComponent.h" />
+    <ClInclude Include="Source\Scene\OrthographicCameraComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Renderer\Texture.cpp">
@@ -128,9 +129,6 @@
     </ClCompile>
     <ClCompile Include="Source\Core\Debug.cpp">
       <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\PerspectiveCameraComponent.cpp">
-      <Filter>Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Renderer\SkyboxDrawable.cpp">
       <Filter>Source\Renderer</Filter>

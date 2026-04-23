@@ -14,6 +14,8 @@
 #include "Scene/FreeCameraControllerComponent.h"
 #include "Scene/DirectionalLightComponent.h"
 #include "Scene/PointLightComponent.h"
+#include "Scene/SpotLightComponent.h"
+#include "Scene/OrthographicCameraComponent.h"
 
 void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 {
@@ -42,8 +44,12 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
     ImGui::Separator();
     ImGui::Text("Components: %d", static_cast<int>(obj.components.size()));
 
-    for (auto& comp : obj.components)
+    int deleteCompIdx = -1;
+
+    for (int compIdx = 0; compIdx < static_cast<int>(obj.components.size()); compIdx++)
     {
+        auto& comp = obj.components[compIdx];
+
         ComponentKind kind = comp->get_component_kind();
         if (kind >= ComponentKind::COUNT)
         {
@@ -51,9 +57,19 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             continue;
         }
 
+        ImGui::PushID(compIdx);
+
         if (kind == ComponentKind::DrawableModel)
         {
-            if (ImGui::TreeNode("Model"))
+            const bool opened = ImGui::TreeNode("Model");
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+                ImGui::EndPopup();
+            }
+
+            if (opened)
             {
                 ModelDrawable* cast = static_cast<ModelDrawable*>(comp.get());
 
@@ -98,7 +114,15 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
         }
         else if (kind == ComponentKind::DrawableSkybox)
         {
-            if (ImGui::TreeNode("Skybox"))
+            const bool opened = ImGui::TreeNode("Skybox");
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+                ImGui::EndPopup();
+            }
+
+            if (opened)
             {
                 SkyboxDrawable* cast = static_cast<SkyboxDrawable*>(comp.get());
                 (void)cast;
@@ -107,7 +131,17 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
         }
         else if (kind == ComponentKind::PerspectiveCamera)
         {
-            if (ImGui::TreeNode("Perspective Camera"))
+            const bool opened = ImGui::TreeNode("Perspective Camera");
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                bool enable = ctx.pScene->currentCamera != ComponentRef{static_cast<u32>(state.selectedObject), static_cast<u32>(compIdx)};
+                if (ImGui::MenuItem("Delete component", 0, false, enable))
+                    deleteCompIdx = compIdx;
+                if (!enable)
+                    ImGui::Text("Cannot delete current camera component");
+                ImGui::EndPopup();
+            }
+            if (opened)
             {
                 PerspectiveCameraComponent* cast = static_cast<PerspectiveCameraComponent*>(comp.get());
 
@@ -116,16 +150,71 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 ImGui::DragFloat("Pitch", &cast->pitch, 0.5f, -89.0f, 89.0f, "%.2f");
                 ImGui::DragFloat3("World Up", &cast->worldUp.x, 0.01f, -1.0f, 1.0f, "%.2f");
 
+                ImGui::Separator();
+                ImGui::DragFloat("FOV", &cast->fovDeg, 0.1f, 1.0f, 179.0f, "%.2f");
+                ImGui::DragFloat("Near Plane", &cast->nearPlane, 0.01f, 0.001f, 1000.0f, "%.3f");
+                ImGui::DragFloat("Far Plane", &cast->farPlane, 0.1f, 0.01f, 10000.0f, "%.2f");
+
+                if (cast->farPlane <= cast->nearPlane)
+                    cast->farPlane = cast->nearPlane + 0.1f;
+
+                ImGui::TreePop();
+            }
+        }
+        else if (kind == ComponentKind::OrthographicCamera)
+        {
+            const bool opened = ImGui::TreeNode("Orthographic Camera");
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                bool enable = ctx.pScene->currentCamera != ComponentRef{static_cast<u32>(state.selectedObject), static_cast<u32>(compIdx)};
+                if (ImGui::MenuItem("Delete component", 0, false, enable))
+                    deleteCompIdx = compIdx;
+                if (!enable)
+                    ImGui::Text("Cannot delete current camera component");
+                ImGui::EndPopup();
+            }
+            
+            if (opened)
+            {
+                OrthographicCameraComponent* cast = static_cast<OrthographicCameraComponent*>(comp.get());
+
+                ImGui::Separator();
+                ImGui::DragFloat("Yaw", &cast->yaw, 0.5f, -360.0f, 360.0f, "%.2f");
+                ImGui::DragFloat("Pitch", &cast->pitch, 0.5f, -89.0f, 89.0f, "%.2f");
+                ImGui::DragFloat3("World Up", &cast->worldUp.x, 0.01f, -1.0f, 1.0f, "%.2f");
+
+                ImGui::Separator();
+                ImGui::DragFloat("Ortho Height", &cast->orthoHeight, 0.1f, 0.1f, 1000.0f, "%.2f");
+                ImGui::DragFloat("Near Plane", &cast->nearPlane, 0.1f, -10000.0f, 10000.0f, "%.2f");
+                ImGui::DragFloat("Far Plane", &cast->farPlane, 0.1f, -10000.0f, 10000.0f, "%.2f");
+
+                if (cast->farPlane <= cast->nearPlane)
+                    cast->farPlane = cast->nearPlane + 0.1f;
+
                 ImGui::TreePop();
             }
         }
         else if (kind == ComponentKind::FreeCameraController)
         {
             ImGui::Text("no yet implemented");
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+                ImGui::EndPopup();
+            }
         }
         else if (kind == ComponentKind::DirectionalLight)
         {
-            if (ImGui::TreeNode("Directional Light"))
+            const bool opened = ImGui::TreeNode("Directional Light");
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+                ImGui::EndPopup();
+            }
+
+            if (opened)
             {
                 DirectionalLightComponent* cast = static_cast<DirectionalLightComponent*>(comp.get());
                 ImGui::Text("Direction is driven by object rotation.");
@@ -136,7 +225,15 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
         }
         else if (kind == ComponentKind::PointLight)
         {
-            if (ImGui::TreeNode("Point Light"))
+            const bool opened = ImGui::TreeNode("Point Light");
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+                ImGui::EndPopup();
+            }
+
+            if (opened)
             {
                 PointLightComponent* cast = static_cast<PointLightComponent*>(comp.get());
                 ImGui::ColorEdit3("Color", &cast->color.x);
@@ -147,6 +244,41 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 ImGui::TreePop();
             }
         }
+        else if (kind == ComponentKind::SpotLight)
+        {
+            const bool opened = ImGui::TreeNode("Spot Light");
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+                ImGui::EndPopup();
+            }
+
+            if (opened)
+            {
+                SpotLightComponent* cast = static_cast<SpotLightComponent*>(comp.get());
+                ImGui::Text("Direction is driven by object rotation.");
+                ImGui::ColorEdit3("Color", &cast->color.x);
+                ImGui::DragFloat("Intensity", &cast->intensity, 0.05f, 0.0f, 50.0f, "%.2f");
+                ImGui::DragFloat("Inner Cutoff", &cast->innerCutoffDeg, 0.1f, 0.0f, 89.0f, "%.2f");
+                ImGui::DragFloat("Outer Cutoff", &cast->outerCutoffDeg, 0.1f, 0.0f, 89.0f, "%.2f");
+                ImGui::DragFloat("Constant", &cast->constant, 0.01f, 0.0f, 10.0f, "%.3f");
+                ImGui::DragFloat("Linear", &cast->linear, 0.001f, 0.0f, 5.0f, "%.3f");
+                ImGui::DragFloat("Quadratic", &cast->quadratic, 0.001f, 0.0f, 5.0f, "%.3f");
+
+                if (cast->outerCutoffDeg < cast->innerCutoffDeg)
+                    cast->outerCutoffDeg = cast->innerCutoffDeg;
+
+                ImGui::TreePop();
+            }
+        }
+
+        ImGui::PopID();
+    }
+
+    if (deleteCompIdx >= 0 && deleteCompIdx < static_cast<int>(obj.components.size()))
+    {
+        ctx.pScene->delete_object_component(state.selectedObject, deleteCompIdx);
     }
 
     if (ImGui::Button("Add new component", ImVec2(-FLT_MIN, 0.0f)))
@@ -164,9 +296,11 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             "DrawableModel",
             "DrawableSkybox",
             "PerspectiveCamera",
+            "OrthographicCamera",
             "FreeCameraController",
             "DirectionalLight",
-            "PointLight"
+            "PointLight",
+            "SpotLight"
         };
 
         ImGui::Combo("Component", &selectedItem, items, IM_ARRAYSIZE(items));
@@ -187,6 +321,10 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             {
                 scene.add_object_component<PerspectiveCameraComponent>(state.selectedObject);
             }
+            else if (selectedKind == ComponentKind::OrthographicCamera)
+            {
+                scene.add_object_component<OrthographicCameraComponent>(state.selectedObject);
+            }
             else if (selectedKind == ComponentKind::FreeCameraController)
             {
                 scene.add_object_component<FreeCameraControllerComponent>(state.selectedObject);
@@ -198,6 +336,10 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             else if (selectedKind == ComponentKind::PointLight)
             {
                 scene.add_object_component<PointLightComponent>(state.selectedObject);
+            }
+            else if (selectedKind == ComponentKind::SpotLight)
+            {
+                scene.add_object_component<SpotLightComponent>(state.selectedObject);
             }
 
             ImGui::CloseCurrentPopup();

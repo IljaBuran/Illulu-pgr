@@ -11,6 +11,8 @@ struct ComponentRef
 {
     u32 objectIdx    = std::numeric_limits<u32>::max();
     u32 componentIdx = std::numeric_limits<u32>::max();
+
+    bool operator==(const ComponentRef&) const = default;
 };
 
 enum class ComponentKind : i8
@@ -18,6 +20,7 @@ enum class ComponentKind : i8
     DrawableModel,
     DrawableSkybox,
     PerspectiveCamera,
+    OrthographicCamera,
     FreeCameraController,
     DirectionalLight,
     PointLight,
@@ -45,6 +48,8 @@ inline const char* component_kind_to_string(ComponentKind ck)
         return "DrawableSkybox";
     else if (ck == ComponentKind::PerspectiveCamera)
         return "PerspectiveCamera";
+    else if (ck == ComponentKind::OrthographicCamera)
+        return "OrthographicCamera";
     else if (ck == ComponentKind::FreeCameraController)
         return "FreeCameraController";
     else if (ck == ComponentKind::DirectionalLight)
@@ -65,6 +70,8 @@ inline ComponentKind component_kind_from_string(const std::string& s)
         return ComponentKind::DrawableSkybox;
     else if (s == "PerspectiveCamera")
         return ComponentKind::PerspectiveCamera;
+    else if (s == "OrthographicCamera")
+        return ComponentKind::OrthographicCamera;
     else if (s == "FreeCameraController")
         return ComponentKind::FreeCameraController;
     else if (s == "DirectionalLight")

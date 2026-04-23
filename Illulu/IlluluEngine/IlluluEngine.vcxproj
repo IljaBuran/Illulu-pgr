@@ -96,6 +96,7 @@
     <ClInclude Include="Source\Scene\DirectionalLightComponent.h" />
     <ClInclude Include="Source\Scene\FreeCameraControllerComponent.h" />
     <ClInclude Include="Source\Scene\ILightComponent.h" />
+    <ClInclude Include="Source\Scene\OrthographicCameraComponent.h" />
     <ClInclude Include="Source\Scene\PerspectiveCameraComponent.h" />
     <ClInclude Include="Source\Scene\ICameraComponent.h" />
     <ClInclude Include="Source\Scene\IComponent.h" />
@@ -129,7 +130,6 @@
     <ClCompile Include="Source\Renderer\Material.cpp" />
     <ClCompile Include="Source\Core\Debug.cpp" />
     <ClCompile Include="Source\Scene\Object.cpp" />
-    <ClCompile Include="Source\Scene\PerspectiveCameraComponent.cpp" />
     <ClCompile Include="Source\Renderer\SkyboxDrawable.cpp" />
     <ClCompile Include="Source\Renderer\ModelDrawable.cpp" />
     <ClCompile Include="Source\Core\Input.cpp" />

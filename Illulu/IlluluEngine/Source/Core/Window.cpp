@@ -3,7 +3,8 @@
 #include "Core/Window.h"
 #include "Core/App.h"
 
-Window::Window(const char* name, i32 width, i32 height) noexcept
+Window::Window(const char* name, i32 width_, i32 height_) noexcept
+    : width(width_), height(height_)
 {       
     if (!glfwInit())
         FATAL_CRASH("GLFW failed to initialize!");
@@ -55,9 +56,12 @@ void Window::swap_buffers() const noexcept
 
 
 
-void Window::_callback_framebuffer_size([[maybe_unused]] GLFWwindow* window, i32 width, i32 height) noexcept
+void Window::_callback_framebuffer_size([[maybe_unused]] GLFWwindow* window, i32 width_, i32 height_) noexcept
 {
-    glViewport(0, 0, width, height);
+    Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    self->width = width_;
+    self->height = height_;
+    glViewport(0, 0, width_, height_);
 }
 
 void Window::_callback_keyboard(GLFWwindow* glfwWindow, i32 key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) noexcept

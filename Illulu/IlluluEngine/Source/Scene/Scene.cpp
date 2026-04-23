@@ -11,6 +11,7 @@
 #include "Renderer/ModelDrawable.h"
 #include "Renderer/SkyboxDrawable.h"
 #include "Scene/PerspectiveCameraComponent.h"
+#include "Scene/OrthographicCameraComponent.h"
 #include "Scene/DirectionalLightComponent.h"
 #include "Scene/PointLightComponent.h"
 #include "Scene/SpotLightComponent.h"
@@ -137,7 +138,7 @@ void Scene::update()
     // note(ilja): nothing to update here for now, animations, scripts etc later
 }
 
-// todo(ilja): this shit will be slow for bigger scenes, just redo later in binary format
+// todo(ilja): this will be slow for bigger scenes, just redo later in binary format
 void Scene::load_from_file(const std::string& path)
 {
     std::ifstream ifs(path);
@@ -228,7 +229,28 @@ void Scene::load_from_file(const std::string& path)
                         std::stof(lGet()),
                         std::stof(lGet())
                     };
-                    add_object_component<PerspectiveCameraComponent>(objectIdx, yaw, pitch, worldUp);
+                    f32 fovDeg = std::stof(lGet());
+                    f32 nearPlane = std::stof(lGet());
+                    f32 farPlane = std::stof(lGet());
+                    add_object_component<PerspectiveCameraComponent>(objectIdx, yaw, pitch, worldUp, 
+                        fovDeg, nearPlane, farPlane);
+                    break;
+                }
+                
+                case ComponentKind::OrthographicCamera:
+                {
+                    f32 yaw = std::stof(lGet());
+                    f32 pitch = std::stof(lGet());
+                    glm::vec3 worldUp = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+                    f32 orthoHeight = std::stof(lGet());
+                    f32 nearPlane = std::stof(lGet());
+                    f32 farPlane = std::stof(lGet());
+                    add_object_component<OrthographicCameraComponent>(objectIdx, yaw, pitch, worldUp, orthoHeight,
+                        nearPlane, farPlane);
                     break;
                 }
 
@@ -260,8 +282,8 @@ void Scene::load_from_file(const std::string& path)
                         std::stof(lGet())
                     };
                     f32 intensity = std::stof(lGet());
-                    f32 constant = std::stof(lGet());
-                    f32 linear = std::stof(lGet());
+                    f32 constant  = std::stof(lGet());
+                    f32 linear    = std::stof(lGet());
                     f32 quadratic = std::stof(lGet());
 
                     add_object_component<PointLightComponent>(objectIdx, color, intensity, constant, linear, quadratic);
@@ -270,12 +292,25 @@ void Scene::load_from_file(const std::string& path)
 
                 case ComponentKind::SpotLight:
                 {
-                    FATAL_CRASH("[SceneLoader]:Spotlight is not yet implemented");
+                    glm::vec3 color = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+                    f32 intensity      = std::stof(lGet());
+                    f32 innerCutoffDeg = std::stof(lGet());
+                    f32 outerCutoffDeg = std::stof(lGet());
+                    f32 constant       = std::stof(lGet());
+                    f32 linear         = std::stof(lGet());
+                    f32 quadratic      = std::stof(lGet());
+                    
+                    add_object_component<SpotLightComponent>(objectIdx, color, intensity, innerCutoffDeg, 
+                        outerCutoffDeg, constant, linear, quadratic);
                     break;
                 }
 
                 default:
-                FATAL_CRASH("[SceneLoader]: Unsupported component kind");
+                    FATAL_CRASH("[SceneLoader]: Unsupported component kind");
                 }
             }
         }
@@ -368,6 +403,23 @@ void Scene::save_to_file(const std::string& path)
                     ofs << cam->worldUp.x << ' '
                         << cam->worldUp.y << ' '
                         << cam->worldUp.z << '\n';
+                    ofs << cam->fovDeg << '\n';
+                    ofs << cam->nearPlane << '\n';
+                    ofs << cam->farPlane << '\n';
+                    break;
+                }
+
+                case ComponentKind::OrthographicCamera:
+                {
+                    const auto* cam = static_cast<const OrthographicCameraComponent*>(comp.get());
+                    ofs << cam->yaw << '\n';
+                    ofs << cam->pitch << '\n';
+                    ofs << cam->worldUp.x << ' '
+                        << cam->worldUp.y << ' '
+                        << cam->worldUp.z << '\n';
+                    ofs << cam->orthoHeight << '\n';
+                    ofs << cam->nearPlane << '\n';
+                    ofs << cam->farPlane << '\n';
                     break;
                 }
 
@@ -398,7 +450,16 @@ void Scene::save_to_file(const std::string& path)
 
                 case ComponentKind::SpotLight:
                 {
-                    FATAL_CRASH("[SceneLoader]:Spotlight is not yet implemented");
+                    const auto* light = static_cast<const SpotLightComponent*>(comp.get());
+                    ofs << light->color.x << ' '
+                        << light->color.y << ' '
+                        << light->color.z << '\n';
+                    ofs << light->intensity << '\n';
+                    ofs << light->innerCutoffDeg << '\n';
+                    ofs << light->outerCutoffDeg << '\n';
+                    ofs << light->constant << '\n';
+                    ofs << light->linear << '\n';
+                    ofs << light->quadratic << '\n';
                     break;
                 }
 

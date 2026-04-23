@@ -1,31 +1,6 @@
-[] Scene.cpp - save/load podla novej struktury
-[] Editor - abstract
-[] Editor - add/delete/rename/duplicate objects
-[] Editor - add/view/delete components
+[] Editor - delete components
+[] Editor - rename object
 
-
-Save file layout:
-----------------------------------------
-[Scene]
-name
-
-[model]
-model_1_path
-   .
-   .
-   .
-[model]
-model_n_path
-
-[object]
-obj_name
-obj_kind
-"individual on what kind the object is"
-numberOfComponents
-
-
-[current_camera]
-currentCameraIdx
-
-[end]
-
+[] Animacia
+[x] Spotlight
+[]

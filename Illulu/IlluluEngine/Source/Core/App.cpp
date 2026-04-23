@@ -30,6 +30,8 @@ bool App::init()
     renderer.init();
     renderer.bind_scene(scene);
 
+    renderer.appContext = &appContext;
+
     lastFrame = (f32)glfwGetTime();
     lastFpsTime = lastFrame;
     deltaTime = 0.0f;
@@ -104,7 +106,8 @@ void App::close()
 
 void App::init_scene()
 {
-    #if _DEBUG
+    // note(ilja): only here to not waste time by selecting which scene i want to open every time
+    #if _DEBUG 
         scene.load_from_file("Resources/Scenes/semestral.ill");
     #else
         scene.load_from_file("Resources/Scenes/starter.ill");

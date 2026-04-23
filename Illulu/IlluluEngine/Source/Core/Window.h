@@ -12,9 +12,11 @@ struct Window
 {
     GLFWwindow* window;
     Input* input = nullptr;
+    i32 width;
+    i32 height;
 
     Window() = delete;
-    Window(const char* name, i32 width, i32 height) noexcept;
+    Window(const char* name, i32 width_, i32 height_) noexcept;
     ~Window();
     
     bool should_close() const noexcept;

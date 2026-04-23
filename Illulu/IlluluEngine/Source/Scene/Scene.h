@@ -88,6 +88,39 @@ struct Scene
         return *raw;
     }
 
+    void delete_object_component(u32 objIdx, u32 compIdx)
+    {
+        if (objIdx >= objects.size())
+        {
+            message_box("Warning", "[delete_object_component]: invalid objIdx").pop_up();
+            return;
+        }
+        Object& obj = objects[objIdx];
+        std::vector<std::unique_ptr<IComponent>>& comps = obj.components;
+        
+        if (compIdx >= comps.size())
+        {
+            message_box("Warning", "[delete_object_component]: invalid compIdx").pop_up();
+            return;
+        }
+
+        IComponent* raw = comps[compIdx].get();
+        if (dynamic_cast<ICameraComponent*>(raw))
+        {
+            std::erase(cachedCameras, ComponentRef{objIdx, compIdx});
+        }
+        if (dynamic_cast<IDrawable*>(raw))
+        {
+            std::erase(cachedDrawables, ComponentRef{objIdx, compIdx});
+        }
+        if (dynamic_cast<ILightComponent*>(raw))
+        {
+            std::erase(cachedLights, ComponentRef{objIdx, compIdx});
+        }
+
+        comps.erase(comps.begin() + compIdx);
+    }
+
     void update();
 
     void load_from_file(const std::string& path);
