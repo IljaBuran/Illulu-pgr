@@ -1,2 +1,6 @@
 [] Animacia
 []
+
+To fix:
+
+import models: it adds whole path into save file, we only need relative from executable
