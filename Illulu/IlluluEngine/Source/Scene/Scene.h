@@ -13,6 +13,7 @@
 #include "Scene/PerspectiveCameraComponent.h"
 #include "Scene/IComponent.h"
 #include "Scene/ILightComponent.h"
+#include "Scene/CollisionBoxComponent.h"
 #include "Renderer/IDrawable.h"
 #include "Renderer/Model.h"
 
@@ -27,14 +28,13 @@ struct Scene
     std::vector<ComponentRef> cachedCameras;
     std::vector<ComponentRef> cachedDrawables;
     std::vector<ComponentRef> cachedLights;
-
-    std::vector<ComponentRef> transparentDrawables;
+    std::vector<ComponentRef> cachedCollisionBoxes;
 
     void add_model(Model&& model);
     void remove_model(u32 idx);
 
     void add_object(Object&& object);
-    void rename_object(u32 idx, const std::string& newName);
+    bool rename_object(u32 idx, const std::string& newName);
     void duplicate_object(u32 idx);
     bool remove_object(u32 idx);
     
@@ -59,6 +59,10 @@ struct Scene
 
         if constexpr (std::is_base_of_v<ILightComponent, T>)
             cachedLights.emplace_back(ComponentRef{idx, compIdx});
+
+        if constexpr (std::is_base_of_v<CollisionBoxComponent, T>)
+            cachedCollisionBoxes.emplace_back(ComponentRef{idx, compIdx});
+
 
         return *static_cast<T*>(objects[idx].components.back().get());
     }
@@ -85,6 +89,9 @@ struct Scene
         if (dynamic_cast<ILightComponent*>(raw))
             cachedLights.emplace_back(ComponentRef{idx, compIdx});
 
+        if (dynamic_cast<CollisionBoxComponent*>(raw))
+            cachedCollisionBoxes.emplace_back(ComponentRef{idx, compIdx});
+
         return *raw;
     }
 
@@ -109,15 +116,40 @@ struct Scene
         {
             std::erase(cachedCameras, ComponentRef{objIdx, compIdx});
         }
+
         if (dynamic_cast<IDrawable*>(raw))
         {
             std::erase(cachedDrawables, ComponentRef{objIdx, compIdx});
         }
+
         if (dynamic_cast<ILightComponent*>(raw))
         {
             std::erase(cachedLights, ComponentRef{objIdx, compIdx});
         }
 
+        if (dynamic_cast<CollisionBoxComponent*>(raw))
+        {
+            std::erase(cachedCollisionBoxes, ComponentRef{objIdx, compIdx});
+        }
+
+        // note(ilja): repair invalidated cache structures
+        for (auto& comp : cachedCameras)
+            if (comp.objectIdx == objIdx)
+                if (comp.componentIdx > compIdx)
+                    comp.componentIdx--;
+        for (auto& comp : cachedDrawables)
+            if (comp.objectIdx == objIdx)
+                if (comp.componentIdx > compIdx)
+                    comp.componentIdx--;
+        for (auto& comp : cachedCameras)
+            if (comp.objectIdx == objIdx)
+                if (comp.componentIdx > compIdx)
+                    comp.componentIdx--;
+        for (auto& comp : cachedCollisionBoxes)
+            if (comp.objectIdx == objIdx)
+                if (comp.componentIdx > compIdx)
+                    comp.componentIdx--;
+        
         comps.erase(comps.begin() + compIdx);
     }
 
@@ -131,4 +163,6 @@ struct Scene
 
     ICameraComponent* get_current_camera_component();
     const ICameraComponent* get_current_camera_component() const;
+
+    void rotate_all_objects_around_origin(const glm::vec3& rotationDeltaDeg);
 };

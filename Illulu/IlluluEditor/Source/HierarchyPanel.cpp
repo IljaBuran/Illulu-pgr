@@ -41,6 +41,10 @@ void HierarchyPanel::draw(AppContext& ctx, EditorState& state)
 {
     Scene& scene = *ctx.pScene;
 
+    static i32 renamingObject = -1;
+    static char renameBuffer[128] = "";
+    static bool openRenamePopup = false;
+
     ImGui::Begin("Hierarchy");
 
     if (scene.objects.empty())
@@ -107,7 +111,16 @@ void HierarchyPanel::draw(AppContext& ctx, EditorState& state)
 
                 if (ImGui::MenuItem("Rename"))
                 {
-                    // todo(ilja): rename implement
+                    renamingObject = i;
+
+                    strncpy_s(
+                        renameBuffer,
+                        sizeof(renameBuffer),
+                        scene.objects[i].name.c_str(),
+                        _TRUNCATE
+                    );
+
+                    openRenamePopup = true;
                 }
 
                 if (auto camRef = find_camera_component_ref(scene, static_cast<u32>(i)); camRef.has_value())
@@ -143,6 +156,54 @@ void HierarchyPanel::draw(AppContext& ctx, EditorState& state)
         }
 
         ImGui::EndListBox();
+    }
+
+    if (openRenamePopup)
+    {
+        ImGui::OpenPopup("rename_stack");
+        openRenamePopup = false;
+    }
+
+    if (ImGui::BeginPopupModal("rename_stack", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        state.locked = true;
+
+        ImGui::Text("Rename object:");
+
+        if (ImGui::IsWindowAppearing())
+            ImGui::SetKeyboardFocusHere();
+
+        ImGui::InputText(
+            "##rename_input",
+            renameBuffer,
+            IM_ARRAYSIZE(renameBuffer)
+        );
+
+        if (ImGui::Button("Apply"))
+        {
+            if (renamingObject >= 0 && renamingObject < static_cast<i32>(scene.objects.size()))
+            {
+                if (!scene.rename_object(renamingObject, renameBuffer))
+                {
+                    message_box("Warning", "Object with selected name already exists!").pop_up();
+                }
+            }
+
+            renamingObject = -1;
+            state.locked = false;
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Close"))
+        {
+            renamingObject = -1;
+            state.locked = false;
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
     }
 
     ImGui::End();

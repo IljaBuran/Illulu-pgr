@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\Renderer\Material.h" />
+    <ClInclude Include="Source\Scene\CollisionBoxComponent.h" />
     <ClInclude Include="Source\Scene\DirectionalLightComponent.h" />
     <ClInclude Include="Source\Scene\FreeCameraControllerComponent.h" />
     <ClInclude Include="Source\Scene\ILightComponent.h" />
@@ -127,7 +128,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\Material.cpp" />
     <ClCompile Include="Source\Core\Debug.cpp" />
     <ClCompile Include="Source\Scene\Object.cpp" />
     <ClCompile Include="Source\Renderer\SkyboxDrawable.cpp" />

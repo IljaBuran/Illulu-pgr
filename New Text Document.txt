@@ -1,6 +1,2 @@
-[] Editor - delete components
-[] Editor - rename object
-
 [] Animacia
-[x] Spotlight
 []

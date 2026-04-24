@@ -73,7 +73,7 @@ u32 load_cubemap(const std::array<std::string, 6>& faces)
             default:
                 FATAL_CRASH("[load_cubemap]: Unexpected number of channels");
         }
-        
+
         glTexImage2D(
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
             0,

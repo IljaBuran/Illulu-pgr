@@ -16,6 +16,7 @@
 #include "Scene/PointLightComponent.h"
 #include "Scene/SpotLightComponent.h"
 #include "Scene/OrthographicCameraComponent.h"
+#include "Scene/CollisionBoxComponent.h"
 
 void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 {
@@ -272,6 +273,32 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 ImGui::TreePop();
             }
         }
+        else if (kind == ComponentKind::CollisionBox)
+        {
+            const bool opened = ImGui::TreeNode("Collision Box");
+
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+
+                ImGui::EndPopup();
+            }
+
+            if (opened)
+            {
+                CollisionBoxComponent* cast = static_cast<CollisionBoxComponent*>(comp.get());
+
+                ImGui::DragFloat3("Offset", &cast->offset.x, 0.01f, -100.0f, 100.0f, "%.2f");
+                ImGui::DragFloat3("Size", &cast->size.x, 0.01f, 0.01f, 100.0f, "%.2f");
+
+                if (cast->size.x < 0.01f) cast->size.x = 0.01f;
+                if (cast->size.y < 0.01f) cast->size.y = 0.01f;
+                if (cast->size.z < 0.01f) cast->size.z = 0.01f;
+
+                ImGui::TreePop();
+            }
+        }
 
         ImGui::PopID();
     }
@@ -300,7 +327,8 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             "FreeCameraController",
             "DirectionalLight",
             "PointLight",
-            "SpotLight"
+            "SpotLight",
+            "CollisionBox"
         };
 
         ImGui::Combo("Component", &selectedItem, items, IM_ARRAYSIZE(items));
@@ -340,6 +368,10 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             else if (selectedKind == ComponentKind::SpotLight)
             {
                 scene.add_object_component<SpotLightComponent>(state.selectedObject);
+            }
+            else if (selectedKind == ComponentKind::CollisionBox)
+            {
+                scene.add_object_component<CollisionBoxComponent>(state.selectedObject);
             }
 
             ImGui::CloseCurrentPopup();

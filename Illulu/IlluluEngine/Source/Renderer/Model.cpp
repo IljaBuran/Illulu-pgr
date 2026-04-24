@@ -131,7 +131,7 @@ Material ModelLoader::load_material(aiMaterial* material)
 
     aiColor3D diffuse(1.0f, 1.0f, 1.0f);
     if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse) == aiReturn_SUCCESS)
-        out.diffuseCol = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
+        out.diffuseCol = glm::vec4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
 
     aiColor3D specular(0.25f, 0.25f, 0.25f);
     if (material->Get(AI_MATKEY_COLOR_SPECULAR, specular) == aiReturn_SUCCESS)
@@ -150,8 +150,13 @@ Material ModelLoader::load_material(aiMaterial* material)
     const bool hasExplicitOpacity =
         (material->Get(AI_MATKEY_OPACITY, opacity) == aiReturn_SUCCESS);
 
-    if (hasExplicitOpacity && opacity < 0.999f)
-        out.blendMode = BlendMode::Transparent;
+    if (hasExplicitOpacity)
+    {
+        out.diffuseCol.a = opacity;
+
+        if (opacity < 0.999f)
+            out.blendMode = BlendMode::Transparent;
+    }
 
     aiBlendMode aiBlend = aiBlendMode_Default;
     if (material->Get(AI_MATKEY_BLEND_FUNC, aiBlend) & aiReturn_SUCCESS)

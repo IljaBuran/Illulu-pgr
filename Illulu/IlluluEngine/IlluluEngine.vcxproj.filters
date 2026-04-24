@@ -101,6 +101,7 @@
     </ClInclude>
     <ClInclude Include="Source\Scene\SpotLightComponent.h" />
     <ClInclude Include="Source\Scene\OrthographicCameraComponent.h" />
+    <ClInclude Include="Source\Scene\CollisionBoxComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Renderer\Texture.cpp">
@@ -141,9 +142,6 @@
     </ClCompile>
     <ClCompile Include="Source\Core\Filesystem.cpp">
       <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\Material.cpp">
-      <Filter>Source\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Renderer\ModelDrawable.cpp">
       <Filter>Source\Renderer</Filter>

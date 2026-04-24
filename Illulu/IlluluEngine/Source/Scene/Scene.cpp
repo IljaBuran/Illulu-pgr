@@ -15,8 +15,10 @@
 #include "Scene/DirectionalLightComponent.h"
 #include "Scene/PointLightComponent.h"
 #include "Scene/SpotLightComponent.h"
+#include "Scene/CollisionBoxComponent.h"
 #include "Core/Window.h"
 #include "Core/Debug.h"
+#include <limits>
 
 void Scene::add_model(Model&& model)
 {
@@ -33,9 +35,19 @@ void Scene::add_object(Object&& object)
     objects.push_back(std::move(object));
 }
 
-void Scene::rename_object(u32 idx, const std::string& newName)
+bool Scene::rename_object(u32 idx, const std::string& newName)
 {
+    if (newName.empty())
+        return false;
+
+    for (const auto& obj : objects)
+    {
+        if (obj.name == newName)
+            return false;
+    }
+
     objects[idx].name = newName;
+    return true;
 }
 
 void Scene::duplicate_object(u32 idx)
@@ -44,7 +56,27 @@ void Scene::duplicate_object(u32 idx)
         return;
 
     Object copy;
-    copy.name = objects[idx].name + "_copy";
+
+    std::string newName;
+    // note(ilja): here it might never end, but there should never be 2^32 objects with the same prefix
+    for (u32 i = 1; i < std::numeric_limits<u32>::max(); i++)
+    {
+        newName = objects[idx].name + std::to_string(i);
+
+        bool nameExists = false;
+        for (const auto& obj : objects)
+        {
+            if (obj.name == newName)
+            {
+                nameExists = true;
+                break;
+            }
+        }
+        if (!nameExists)
+            break;
+    }
+
+    copy.name = newName;
     copy.transform = objects[idx].transform;
 
     std::vector<std::unique_ptr<IComponent>> clonedComponents;
@@ -150,6 +182,10 @@ void Scene::load_from_file(const std::string& path)
 
     objects.clear();
     models.clear();
+    cachedCameras.clear();
+    cachedDrawables.clear();
+    cachedLights.clear();
+    cachedCollisionBoxes.clear();
     currentCamera = {};
 
     auto lGet = [&]() -> std::string
@@ -309,6 +345,24 @@ void Scene::load_from_file(const std::string& path)
                     break;
                 }
 
+                case ComponentKind::CollisionBox:
+                {
+                    glm::vec3 offset = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+
+                    glm::vec3 size = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+
+                    add_object_component<CollisionBoxComponent>(objectIdx, offset, size);
+                    break;
+                }
+
                 default:
                     FATAL_CRASH("[SceneLoader]: Unsupported component kind");
                 }
@@ -463,6 +517,21 @@ void Scene::save_to_file(const std::string& path)
                     break;
                 }
 
+                case ComponentKind::CollisionBox:
+                {
+                    const auto* box = static_cast<const CollisionBoxComponent*>(comp.get());
+
+                    ofs << box->offset.x << ' '
+                        << box->offset.y << ' '
+                        << box->offset.z << '\n';
+
+                    ofs << box->size.x << ' '
+                        << box->size.y << ' '
+                        << box->size.z << '\n';
+
+                    break;
+                }
+
                 default:
                     FATAL_CRASH("[Scene::save_to_file]: Unsupported component kind");
             }
@@ -495,4 +564,21 @@ ICameraComponent* Scene::get_current_camera_component()
 const ICameraComponent* Scene::get_current_camera_component() const
 {
     return reinterpret_cast<const ICameraComponent*>(objects[currentCamera.objectIdx].components[currentCamera.componentIdx].get());
+}
+
+void Scene::rotate_all_objects_around_origin(const glm::vec3& rotationDeltaDeg)
+{
+    glm::mat4 rot(1.0f);
+
+    rot = glm::rotate(rot, glm::radians(rotationDeltaDeg.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    rot = glm::rotate(rot, glm::radians(rotationDeltaDeg.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    rot = glm::rotate(rot, glm::radians(rotationDeltaDeg.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    for (Object& obj : objects)
+    {
+        glm::vec4 newPos = rot * glm::vec4(obj.transform.position, 1.0f);
+        obj.transform.position = glm::vec3(newPos);
+
+        obj.transform.rotation += rotationDeltaDeg;
+    }
 }

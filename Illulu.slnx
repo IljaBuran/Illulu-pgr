@@ -4,6 +4,8 @@
   </Configurations>
   <Folder Name="/Resources/" />
   <Folder Name="/Resources/Shaders/">
+    <File Path="DebugLine.frag" />
+    <File Path="DebugLine.vert" />
     <File Path="Resources/Shaders/Basic.frag" />
     <File Path="Resources/Shaders/Basic.vert" />
     <File Path="Resources/Shaders/Skybox.frag" />

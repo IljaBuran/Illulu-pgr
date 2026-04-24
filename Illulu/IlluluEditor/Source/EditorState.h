@@ -8,5 +8,8 @@ struct EditorState
     bool editMode = true;
     bool showImGuiDemo = false;
     bool locked = false;
+
+    // views
+    bool showCollisionBoxes = false;
 };
 

@@ -24,7 +24,7 @@ struct RenderItem
     f32 distanceToCamera = 0.0f;
 };
 
-static constexpr i32 MAX_POINT_LIGHTS = 8;
+static constexpr i32 MAX_POINT_LIGHTS = 16;
 static constexpr i32 MAX_SPOT_LIGHTS = 16;
 
 struct RendererHandles
@@ -47,32 +47,37 @@ struct RendererHandles
     i32 blendMode = -1;
     i32 alphaCutoff = -1;
 
+    // directional light
     i32 dirLightDirection = -1;
     i32 dirLightColor = -1;
     i32 dirLightIntensity = -1;
 
+    // pointlight
     i32 pointLightCount = -1;
-    i32 pointLightPositions[MAX_POINT_LIGHTS];
-    i32 pointLightColors[MAX_POINT_LIGHTS];
-    i32 pointLightIntensities[MAX_POINT_LIGHTS];
-    i32 pointLightConstants[MAX_POINT_LIGHTS];
-    i32 pointLightLinears[MAX_POINT_LIGHTS];
-    i32 pointLightQuadratics[MAX_POINT_LIGHTS];
+    i32 pointLightPositions[MAX_POINT_LIGHTS]{};
+    i32 pointLightColors[MAX_POINT_LIGHTS]{};
+    i32 pointLightIntensities[MAX_POINT_LIGHTS]{};
+    i32 pointLightConstants[MAX_POINT_LIGHTS]{};
+    i32 pointLightLinears[MAX_POINT_LIGHTS]{};
+    i32 pointLightQuadratics[MAX_POINT_LIGHTS]{};
 
+    // spotlight
     i32 spotLightCount = -1;
 
-    i32 spotLightPositions[MAX_SPOT_LIGHTS];
-    i32 spotLightDirections[MAX_SPOT_LIGHTS];
-    i32 spotLightColors[MAX_SPOT_LIGHTS];
-    i32 spotLightIntensities[MAX_SPOT_LIGHTS];
-    i32 spotLightInnerCutoffCos[MAX_SPOT_LIGHTS];
-    i32 spotLightOuterCutoffCos[MAX_SPOT_LIGHTS];
-    i32 spotLightConstants[MAX_SPOT_LIGHTS];
-    i32 spotLightLinears[MAX_SPOT_LIGHTS];
-    i32 spotLightQuadratics[MAX_SPOT_LIGHTS];
+    i32 spotLightPositions[MAX_SPOT_LIGHTS]{};
+    i32 spotLightDirections[MAX_SPOT_LIGHTS]{};
+    i32 spotLightColors[MAX_SPOT_LIGHTS]{};
+    i32 spotLightIntensities[MAX_SPOT_LIGHTS]{};
+    i32 spotLightInnerCutoffCos[MAX_SPOT_LIGHTS]{};
+    i32 spotLightOuterCutoffCos[MAX_SPOT_LIGHTS]{};
+    i32 spotLightConstants[MAX_SPOT_LIGHTS]{};
+    i32 spotLightLinears[MAX_SPOT_LIGHTS]{};
+    i32 spotLightQuadratics[MAX_SPOT_LIGHTS]{};
     
     i32 viewPos = -1;
     i32 ambientStrength = -1;
+
+    i32 normalView = -1;
 };
 
 struct SkyboxHandles
@@ -81,13 +86,32 @@ struct SkyboxHandles
     i32 skyboxTex = -1;
 };
 
+struct DebugHandles
+{
+    i32 PVM = -1;
+    i32 color = -1;
+};
+
+
 struct Renderer
 {
-    Shader shader;
+    Shader basicShader;
     Shader skyboxShader;
-
     RendererHandles handles;
     SkyboxHandles skyboxHandles;
+
+    // todo(ilja): think through wherther leave it here
+    Shader debugLineShader;
+    DebugHandles debugHandles;
+    u32 debugCubeVao = 0;
+    u32 debugCubeVbo = 0;
+    bool showCollisionBoxes = false;
+    void init_debug_cube();
+    void draw_collision_boxes();
+    glm::mat4 build_collision_box_pvm(const Transform& transform, const CollisionBoxComponent& box) const;
+    ////////////
+
+
 
     void init();
     void begin_frame();
@@ -100,6 +124,18 @@ struct Renderer
 
     // todo(ilja): decide
     AppContext* appContext;
+
+    void toggle_normal_view() const
+    {
+        i32 currentState;
+        glGetUniformiv(basicShader.shaderProgram, handles.normalView, &currentState);
+        glUniform1i(handles.normalView, currentState == 0 ? 1 : 0);
+    }
+    void toggle_collision_boxes_view()
+    {
+        showCollisionBoxes = !showCollisionBoxes;
+    }
+
 private:
     const Scene* pScene = nullptr;
 
