@@ -121,6 +121,12 @@ void EditorApp::update(f32 deltaTime)
 
     if (input.is_key_pressed(GLFW_KEY_SPACE) && !state->locked)
     {
+        if (!state->editMode)
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            io.ClearInputKeys();
+            io.ClearInputMouse();
+        }
         state->editMode = !state->editMode;
         input.mouseBegin = true;
 

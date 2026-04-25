@@ -97,6 +97,11 @@ void MenuBarPanel::draw(AppContext& ctx, EditorState& state)
                 openRotateAllPopup = true;
             }
 
+            if (ImGui::MenuItem("Recompile all shaders (currently basic, skybox, debugline)"))
+            {
+                ctx.pRenderer->reload_shaders();
+            }
+
             ImGui::EndMenu();
         }
 

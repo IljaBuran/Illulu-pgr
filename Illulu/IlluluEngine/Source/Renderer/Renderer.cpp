@@ -135,6 +135,13 @@ glm::mat4 Renderer::build_collision_box_pvm(
     return projection * view * model;
 }
 
+void Renderer::reload_shaders()
+{
+    basicShader.reload();
+    skyboxShader.reload();
+    debugLineShader.reload();
+}
+
 void Renderer::init()
 {
     basicShader.load_shader_from_source("Resources/Shaders/Basic.vert", GL_VERTEX_SHADER);

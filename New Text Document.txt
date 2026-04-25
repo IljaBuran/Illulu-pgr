@@ -1,6 +1,10 @@
-[] Animacia
-[]
+PGR semestral:
+[] simple animation
+[] fog
+[] movement on circle
 
-To fix:
+!To fix!:
 
-import models: it adds whole path into save file, we only need relative from executable
+[] import models: it adds whole path into save file, we only need relative from executable
+[] reload_shaders: it fucks up boolean that controls it in editor
+[] redo debug views(normal, collisionbox) into separate shaders

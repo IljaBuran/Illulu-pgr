@@ -109,6 +109,7 @@ struct Renderer
     void init_debug_cube();
     void draw_collision_boxes();
     glm::mat4 build_collision_box_pvm(const Transform& transform, const CollisionBoxComponent& box) const;
+    void reload_shaders();
     ////////////
 
 
