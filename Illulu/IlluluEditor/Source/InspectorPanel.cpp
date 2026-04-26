@@ -17,6 +17,7 @@
 #include "Scene/SpotLightComponent.h"
 #include "Scene/OrthographicCameraComponent.h"
 #include "Scene/CollisionBoxComponent.h"
+#include "Scene/DistanceFogComponent.h"
 
 void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 {
@@ -174,7 +175,7 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                     ImGui::Text("Cannot delete current camera component");
                 ImGui::EndPopup();
             }
-            
+
             if (opened)
             {
                 OrthographicCameraComponent* cast = static_cast<OrthographicCameraComponent*>(comp.get());
@@ -195,6 +196,68 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 ImGui::TreePop();
             }
         }
+        else if (kind == ComponentKind::DistanceFog)
+        {
+            const bool opened = ImGui::TreeNode("Distance Fog");
+
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+
+                ImGui::EndPopup();
+            }
+
+            if (opened)
+            {
+                DistanceFogComponent* cast = static_cast<DistanceFogComponent*>(comp.get());
+
+                const char* fogModes[] =
+                {
+                    "Off",
+                    "Linear",
+                    "Exponential"
+                };
+
+                int mode = static_cast<int>(cast->mode);
+
+                if (ImGui::Combo("Mode", &mode, fogModes, IM_ARRAYSIZE(fogModes)))
+                {
+                    cast->mode = static_cast<DistanceFogType>(mode);
+                }
+
+                ImGui::ColorEdit3("Fog Color", &cast->color.x);
+
+                ImGui::Separator();
+
+                if (cast->mode == DistanceFogType::Linear)
+                {
+                    ImGui::Text("Linear fog:");
+                    ImGui::DragFloat("Start", &cast->start, 0.1f, 0.0f, 10000.0f, "%.2f");
+                    ImGui::DragFloat("End", &cast->end, 0.1f, 0.01f, 10000.0f, "%.2f");
+
+                    if (cast->end <= cast->start)
+                        cast->end = cast->start + 0.1f;
+                }
+                else if (cast->mode == DistanceFogType::Exp)
+                {
+                    ImGui::Text("Exponential fog:");
+                    ImGui::DragFloat("Density", &cast->density, 0.001f, 0.0f, 5.0f, "%.4f");
+                }
+                else
+                {
+                    ImGui::TextDisabled("Fog is disabled.");
+                }
+
+                ImGui::Separator();
+                ImGui::TextWrapped(
+                    "Distance fog is applied globally from the active camera. "
+                    "For best results, add this component to the camera object."
+                );
+
+                ImGui::TreePop();
+            }
+            }
         else if (kind == ComponentKind::FreeCameraController)
         {
             ImGui::Text("no yet implemented");
@@ -325,6 +388,7 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             "PerspectiveCamera",
             "OrthographicCamera",
             "FreeCameraController",
+            "DistanceFog",
             "DirectionalLight",
             "PointLight",
             "SpotLight",
@@ -356,6 +420,10 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             else if (selectedKind == ComponentKind::FreeCameraController)
             {
                 scene.add_object_component<FreeCameraControllerComponent>(state.selectedObject);
+            }
+            else if (selectedKind == ComponentKind::DistanceFog)
+            {
+                scene.add_object_component<DistanceFogComponent>(state.selectedObject);
             }
             else if (selectedKind == ComponentKind::DirectionalLight)
             {

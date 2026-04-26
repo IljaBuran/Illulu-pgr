@@ -31,6 +31,7 @@ struct RendererHandles
 {
     i32 PVM = -1;
     i32 M = -1;
+    i32 V = -1;
 
     i32 color = -1;
 
@@ -46,6 +47,13 @@ struct RendererHandles
 
     i32 blendMode = -1;
     i32 alphaCutoff = -1;
+
+    // fog
+    i32 fogMode = -1;
+    i32 fogColor = -1;
+    i32 fogStart = -1;
+    i32 fogEnd = -1;
+    i32 fogDensity = -1;
 
     // directional light
     i32 dirLightDirection = -1;

@@ -40,7 +40,20 @@ void AssetPanel::import_model(Scene& scene, EditorState& state)
 
     if (result == NFD_OKAY)
     {
-        Model model = ModelLoader(path.get());
+        auto lMakeResourceRelativePath = [](const std::string& absolutePath) -> std::string
+        {
+            namespace fs = std::filesystem;
+
+            fs::path abs = fs::absolute(absolutePath);
+            fs::path current = fs::current_path();
+            fs::path relative = fs::relative(abs, current);
+
+            return relative.generic_string();
+        };
+
+        std::string relativePath = lMakeResourceRelativePath(path.get());
+        
+        Model model = ModelLoader(relativePath.c_str());
         scene.add_model(std::move(model));
 
         state.selectedModel = static_cast<i32>(scene.models.size()) - 1;

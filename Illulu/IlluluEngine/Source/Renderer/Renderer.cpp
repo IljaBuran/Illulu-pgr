@@ -16,6 +16,7 @@
 #include "Scene/DirectionalLightComponent.h"
 #include "Scene/PointLightComponent.h"
 #include "Scene/SpotLightComponent.h"
+#include "Scene/DistanceFogComponent.h"
 #include <cmath>
 
 // todo(ilja): ...
@@ -23,19 +24,19 @@ void Renderer::init_debug_cube()
 {
     constexpr f32 vertices[] =
     {
-        // bottom
+        // note(ilja): bottom
         -0.5f, -0.5f, -0.5f,   0.5f, -0.5f, -0.5f,
          0.5f, -0.5f, -0.5f,   0.5f, -0.5f,  0.5f,
          0.5f, -0.5f,  0.5f,  -0.5f, -0.5f,  0.5f,
         -0.5f, -0.5f,  0.5f,  -0.5f, -0.5f, -0.5f,
 
-        // top
+        // note(ilja): top
         -0.5f,  0.5f, -0.5f,   0.5f,  0.5f, -0.5f,
          0.5f,  0.5f, -0.5f,   0.5f,  0.5f,  0.5f,
          0.5f,  0.5f,  0.5f,  -0.5f,  0.5f,  0.5f,
         -0.5f,  0.5f,  0.5f,  -0.5f,  0.5f, -0.5f,
 
-        // verticals
+        // note(ilja): verticals
         -0.5f, -0.5f, -0.5f,  -0.5f,  0.5f, -0.5f,
          0.5f, -0.5f, -0.5f,   0.5f,  0.5f, -0.5f,
          0.5f, -0.5f,  0.5f,   0.5f,  0.5f,  0.5f,
@@ -75,8 +76,7 @@ void Renderer::draw_collision_boxes()
     glDisable(GL_BLEND);
     glDisable(GL_CULL_FACE);
 
-    // Collision boxy budú viditeľné aj cez objekty.
-    // Ak chceš, aby sa schovávali za objektmi, túto časť vymaž.
+    // note(ilja): this makes the lines visible through objects, remove if unwanted behaviour
     glDisable(GL_DEPTH_TEST);
 
     glm::vec3 debugColor(1.0f, 1.0f, 0.0f);
@@ -112,10 +112,7 @@ void Renderer::draw_collision_boxes()
     basicShader.use();
 }
 
-glm::mat4 Renderer::build_collision_box_pvm(
-    const Transform& transform,
-    const CollisionBoxComponent& box
-) const
+glm::mat4 Renderer::build_collision_box_pvm(const Transform& transform, const CollisionBoxComponent& box) const
 {
     const Object* camObj = pScene->get_current_camera_object();
     const ICameraComponent* cam = pScene->get_current_camera_component();
@@ -150,6 +147,7 @@ void Renderer::init()
 
     handles.PVM = basicShader.get_uniform_location("PVM");
     handles.M = basicShader.get_uniform_location("M");
+    handles.V = basicShader.get_uniform_location("V");
     handles.color = basicShader.get_uniform_location("color");
     handles.texDiffuse = basicShader.get_uniform_location("texDiffuse");
     handles.texSpecular = basicShader.get_uniform_location("texSpecular");
@@ -160,6 +158,13 @@ void Renderer::init()
     handles.shininess = basicShader.get_uniform_location("materialShininess");
     handles.blendMode = basicShader.get_uniform_location("materialBlendMode");
     handles.alphaCutoff = basicShader.get_uniform_location("alphaCutoff");
+
+    handles.fogMode = basicShader.get_uniform_location("fogMode");
+    handles.fogColor = basicShader.get_uniform_location("fogColor");
+    handles.fogStart = basicShader.get_uniform_location("fogStart");
+    handles.fogEnd = basicShader.get_uniform_location("fogEnd");
+    handles.fogDensity = basicShader.get_uniform_location("fogDensity");
+
     handles.dirLightDirection = basicShader.get_uniform_location("dirLightDirection");
     handles.dirLightColor = basicShader.get_uniform_location("dirLightColor");
     handles.dirLightIntensity = basicShader.get_uniform_location("dirLightIntensity");
@@ -251,6 +256,16 @@ void Renderer::begin_frame()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     basicShader.use();
 
+    // note(ilja): get camera and upload
+    const Object* camObj = pScene->get_current_camera_object();
+    const ICameraComponent* cam = pScene->get_current_camera_component();
+
+    if (!camObj || !cam)
+        FATAL_CRASH("[RENDERER]: Current camera object/component missing");
+
+    glm::mat4 view = cam->get_view_matrix(camObj->transform);
+    glUniformMatrix4fv(handles.V, 1, GL_FALSE, glm::value_ptr(view));
+
     glUniform1i(handles.texDiffuse, 0);
     glUniform1i(handles.texSpecular, 1);
     glUniform1f(handles.alphaCutoff, 0.5f);
@@ -258,6 +273,27 @@ void Renderer::begin_frame()
     glm::vec3 camPos = get_camera_world_position();
     glUniform3fv(handles.viewPos, 1, glm::value_ptr(camPos));
     glUniform1f(handles.ambientStrength, 0.12f);
+
+    const DistanceFogComponent* fog = camObj->get_component<DistanceFogComponent>();
+
+    if (fog)
+    {
+        glUniform1i(handles.fogMode, static_cast<i32>(fog->mode));
+        glUniform3fv(handles.fogColor, 1, glm::value_ptr(fog->color));
+        glUniform1f(handles.fogStart, fog->start);
+        glUniform1f(handles.fogEnd, fog->end);
+        glUniform1f(handles.fogDensity, fog->density);
+    }
+    else
+    {
+        glUniform1i(handles.fogMode, static_cast<i32>(DistanceFogType::Off));
+
+        glm::vec3 fallbackFogColor(0.55f, 0.60f, 0.65f);
+        glUniform3fv(handles.fogColor, 1, glm::value_ptr(fallbackFogColor));
+        glUniform1f(handles.fogStart, 20.0f);
+        glUniform1f(handles.fogEnd, 120.0f);
+        glUniform1f(handles.fogDensity, 0.025f);
+    }
 
     glm::vec3 dir;
     glm::vec3 col;
@@ -339,7 +375,7 @@ void Renderer::draw()
         }
     }
 
-    // opaque + masked first
+    // note(ilja): opaque and masked first
     basicShader.use();
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);
@@ -354,7 +390,7 @@ void Renderer::draw()
         item.mesh->draw();
     }
 
-    // transparent back-to-front
+    // note(ilja): transparent back-to-front
     std::sort(
         transparentItems.begin(),
         transparentItems.end(),
@@ -469,7 +505,7 @@ glm::vec3 Renderer::get_object_forward_x(const Transform& transform) const
 f32 Renderer::get_aspect_ratio() const
 {
     f32 res = static_cast<f32>(appContext->pWindow->width) / static_cast<f32>(appContext->pWindow->height);
-    // note(ilkja): this might sometimes be nan, for example after returning from minimized windows (minimized window -> framebuffer 0x0)
+    // note(ilja): this might sometimes be nan, for example after returning from minimized windows (minimized window -> framebuffer 0x0)
     return std::isnan(res) ? 16.0f / 9.0f : res;
 }
 

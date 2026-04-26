@@ -16,6 +16,7 @@
 #include "Scene/PointLightComponent.h"
 #include "Scene/SpotLightComponent.h"
 #include "Scene/CollisionBoxComponent.h"
+#include "Scene/DistanceFogComponent.h"
 #include "Core/Window.h"
 #include "Core/Debug.h"
 #include <limits>
@@ -296,6 +297,24 @@ void Scene::load_from_file(const std::string& path)
                     FATAL_CRASH("NOT IMPLEMENTED");
                 }
 
+                case ComponentKind::DistanceFog:
+                {
+                    DistanceFogType mode = static_cast<DistanceFogType>(std::stoul(lGet()));
+                    
+                    glm::vec3 color = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+
+                    f32 start = std::stof(lGet());
+                    f32 end = std::stof(lGet());
+                    f32 density = std::stof(lGet());
+                    add_object_component<DistanceFogComponent>(objectIdx, mode, color, start, end, density);
+                    
+                    break;
+                }
+
                 case ComponentKind::DirectionalLight:
                 {
                     glm::vec3 color = {
@@ -474,6 +493,21 @@ void Scene::save_to_file(const std::string& path)
                     ofs << cam->orthoHeight << '\n';
                     ofs << cam->nearPlane << '\n';
                     ofs << cam->farPlane << '\n';
+                    break;
+                }
+
+                case ComponentKind::DistanceFog:
+                {
+                    const auto* fog = static_cast<const DistanceFogComponent*>(comp.get());
+
+                    ofs << static_cast<u32>(fog->mode) << '\n';
+                    ofs << fog->color.r << ' '
+                        << fog->color.g << ' '
+                        << fog->color.b << '\n';
+                    ofs << fog->start << '\n';
+                    ofs << fog->end << '\n';
+                    ofs << fog->density << '\n';
+
                     break;
                 }
 

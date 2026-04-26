@@ -19,12 +19,18 @@ enum class ComponentKind : i8
 {
     DrawableModel,
     DrawableSkybox,
+
     PerspectiveCamera,
     OrthographicCamera,
+
     FreeCameraController,
+    
+    DistanceFog,
+
     DirectionalLight,
     PointLight,
     SpotLight,
+
     CollisionBox,
     COUNT
 };
@@ -53,6 +59,8 @@ inline const char* component_kind_to_string(ComponentKind ck)
         return "OrthographicCamera";
     else if (ck == ComponentKind::FreeCameraController)
         return "FreeCameraController";
+    else if (ck == ComponentKind::DistanceFog)
+        return "DistanceFog";
     else if (ck == ComponentKind::DirectionalLight)
         return "DirectionalLight";
     else if (ck == ComponentKind::PointLight)
@@ -79,6 +87,8 @@ inline ComponentKind component_kind_from_string(const std::string& s)
         return ComponentKind::FreeCameraController;
     else if (s == "DirectionalLight")
         return ComponentKind::DirectionalLight;
+    else if (s == "DistanceFog")
+        return ComponentKind::DistanceFog;
     else if (s == "PointLight")
         return ComponentKind::PointLight;
     else if (s == "SpotLight")
