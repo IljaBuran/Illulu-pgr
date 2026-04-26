@@ -14,6 +14,8 @@
 #include "Scene/IComponent.h"
 #include "Scene/ILightComponent.h"
 #include "Scene/CollisionBoxComponent.h"
+#include "Scene/OrbitingMovementComponent.h"
+
 #include "Renderer/IDrawable.h"
 #include "Renderer/Model.h"
 
@@ -30,6 +32,8 @@ struct Scene
     std::vector<ComponentRef> cachedLights;
     std::vector<ComponentRef> cachedCollisionBoxes;
 
+    std::vector<ComponentRef> cachedOrbiting; // todo(ilja): ...
+
     void add_model(Model&& model);
     void remove_model(u32 idx);
 
@@ -37,6 +41,8 @@ struct Scene
     bool rename_object(u32 idx, const std::string& newName);
     void duplicate_object(u32 idx);
     bool remove_object(u32 idx);
+
+    void update_orbit_movement(f32 dt);
     
     template<typename T, typename... Args>
     T& add_object_component(u32 idx, Args&&... args)
@@ -63,6 +69,8 @@ struct Scene
         if constexpr (std::is_base_of_v<CollisionBoxComponent, T>)
             cachedCollisionBoxes.emplace_back(ComponentRef{idx, compIdx});
 
+        if constexpr (std::is_base_of_v<OrbitingMovementComponent, T>)
+            cachedOrbiting.emplace_back(ComponentRef{idx, compIdx});
 
         return *static_cast<T*>(objects[idx].components.back().get());
     }
@@ -92,6 +100,9 @@ struct Scene
         if (dynamic_cast<CollisionBoxComponent*>(raw))
             cachedCollisionBoxes.emplace_back(ComponentRef{idx, compIdx});
 
+        if (dynamic_cast<OrbitingMovementComponent*>(raw))
+            cachedOrbiting.emplace_back(ComponentRef{idx, compIdx});
+
         return *raw;
     }
 
@@ -116,20 +127,21 @@ struct Scene
         {
             std::erase(cachedCameras, ComponentRef{objIdx, compIdx});
         }
-
         if (dynamic_cast<IDrawable*>(raw))
         {
             std::erase(cachedDrawables, ComponentRef{objIdx, compIdx});
         }
-
         if (dynamic_cast<ILightComponent*>(raw))
         {
             std::erase(cachedLights, ComponentRef{objIdx, compIdx});
         }
-
         if (dynamic_cast<CollisionBoxComponent*>(raw))
         {
             std::erase(cachedCollisionBoxes, ComponentRef{objIdx, compIdx});
+        }
+        if (dynamic_cast<OrbitingMovementComponent*>(raw))
+        {
+            std::erase(cachedOrbiting, ComponentRef{objIdx, compIdx});
         }
 
         // note(ilja): repair invalidated cache structures
@@ -141,7 +153,7 @@ struct Scene
             if (comp.objectIdx == objIdx)
                 if (comp.componentIdx > compIdx)
                     comp.componentIdx--;
-        for (auto& comp : cachedCameras)
+        for (auto& comp : cachedLights)
             if (comp.objectIdx == objIdx)
                 if (comp.componentIdx > compIdx)
                     comp.componentIdx--;
@@ -149,11 +161,15 @@ struct Scene
             if (comp.objectIdx == objIdx)
                 if (comp.componentIdx > compIdx)
                     comp.componentIdx--;
+        for (auto& comp : cachedOrbiting)
+            if (comp.objectIdx == objIdx)
+                if (comp.componentIdx > compIdx)
+                    comp.componentIdx--;
         
         comps.erase(comps.begin() + compIdx);
     }
 
-    void update();
+    void update(f32 dt);
 
     void load_from_file(const std::string& path);
     void save_to_file(const std::string& path);

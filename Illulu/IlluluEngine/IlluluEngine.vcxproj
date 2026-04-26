@@ -98,6 +98,7 @@
     <ClInclude Include="Source\Scene\DirectionalLightComponent.h" />
     <ClInclude Include="Source\Scene\FreeCameraControllerComponent.h" />
     <ClInclude Include="Source\Scene\ILightComponent.h" />
+    <ClInclude Include="Source\Scene\OrbitingMovementComponent.h" />
     <ClInclude Include="Source\Scene\OrthographicCameraComponent.h" />
     <ClInclude Include="Source\Scene\PerspectiveCameraComponent.h" />
     <ClInclude Include="Source\Scene\ICameraComponent.h" />

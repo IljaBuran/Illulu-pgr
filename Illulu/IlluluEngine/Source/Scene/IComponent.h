@@ -32,6 +32,8 @@ enum class ComponentKind : i8
     SpotLight,
 
     CollisionBox,
+
+    OrbitingMovement,
     COUNT
 };
 
@@ -69,6 +71,8 @@ inline const char* component_kind_to_string(ComponentKind ck)
         return "SpotLight";
     else if (ck == ComponentKind::CollisionBox)
         return "CollisionBox";
+    else if (ck == ComponentKind::OrbitingMovement)
+        return "OrbitingMovement";
 
     return "Here only for the compiler bitching, this should not happen otherwise it's gg";
 }
@@ -95,6 +99,8 @@ inline ComponentKind component_kind_from_string(const std::string& s)
         return ComponentKind::SpotLight;
     else if (s == "CollisionBox")
         return ComponentKind::CollisionBox;
+    else if (s == "OrbitingMovement")
+        return ComponentKind::OrbitingMovement;
     else
         FATAL_CRASH("[ComponentKind]: Unknown kind");   
 }

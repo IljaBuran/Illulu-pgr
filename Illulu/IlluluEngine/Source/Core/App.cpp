@@ -70,7 +70,7 @@ void App::begin_frame()
 
 void App::update()
 {
-    scene.update();
+    scene.update(deltaTime);
 }
 
 void App::render()

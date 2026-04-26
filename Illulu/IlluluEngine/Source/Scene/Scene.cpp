@@ -17,6 +17,7 @@
 #include "Scene/SpotLightComponent.h"
 #include "Scene/CollisionBoxComponent.h"
 #include "Scene/DistanceFogComponent.h"
+#include "Scene/OrbitingMovementComponent.h"
 #include "Core/Window.h"
 #include "Core/Debug.h"
 #include <limits>
@@ -166,9 +167,76 @@ bool Scene::remove_object(u32 idx)
     return true;
 }
 
-void Scene::update()
+void Scene::update_orbit_movement(f32 dt)
 {
-    // note(ilja): nothing to update here for now, animations, scripts etc later
+    for (const ComponentRef& ref : cachedOrbiting)
+    {
+        if (ref.objectIdx >= objects.size())
+            continue;
+
+        Object& obj = objects[ref.objectIdx];
+
+        if (ref.componentIdx >= obj.components.size())
+            continue;
+
+        OrbitingMovementComponent* orbit = dynamic_cast<OrbitingMovementComponent*>(obj.components[ref.componentIdx].get());
+
+        if (!orbit)
+            continue;
+
+        orbit->angle += orbit->speed * dt;
+
+        if (orbit->orbitingAxis == OrbitingAxis::Y)
+        {
+            obj.transform.position.x = orbit->center.x + std::cos(orbit->angle) * orbit->radius;
+            obj.transform.position.y = orbit->center.y + orbit->height;
+            obj.transform.position.z = orbit->center.z + std::sin(orbit->angle) * orbit->radius;
+        }
+        else if (orbit->orbitingAxis == OrbitingAxis::X)
+        {
+            obj.transform.position.x = orbit->center.x + orbit->height;
+            obj.transform.position.y = orbit->center.y + std::cos(orbit->angle) * orbit->radius;
+            obj.transform.position.z = orbit->center.z + std::sin(orbit->angle) * orbit->radius;
+        }
+        else if (orbit->orbitingAxis == OrbitingAxis::Z)
+        {
+            obj.transform.position.x = orbit->center.x + std::cos(orbit->angle) * orbit->radius;
+            obj.transform.position.y = orbit->center.y + std::sin(orbit->angle) * orbit->radius;
+            obj.transform.position.z = orbit->center.z + orbit->height;
+        }
+
+        if (orbit->lookAtCenter)
+        {
+            glm::vec3 dir = orbit->center - obj.transform.position;
+
+            if (glm::length(dir) < 0.0001f)
+                continue;
+
+            dir = glm::normalize(dir);
+
+            f32 yaw = glm::degrees(std::atan2(dir.z, dir.x));
+            f32 pitch = glm::degrees(std::asin(dir.y));
+
+            for (auto& comp : obj.components)
+            {
+                if (PerspectiveCameraComponent* cam1 = dynamic_cast<PerspectiveCameraComponent*>(comp.get()))
+                {
+                    cam1->yaw = yaw;
+                    cam1->pitch = pitch;
+                }
+                else if (OrthographicCameraComponent* cam2 = dynamic_cast<OrthographicCameraComponent*>(comp.get()))
+                {
+                    cam2->yaw = yaw;
+                    cam2->pitch = pitch;
+                }
+            }
+        }
+    }
+}
+
+void Scene::update(f32 dt)
+{
+    update_orbit_movement(dt);
 }
 
 // todo(ilja): this will be slow for bigger scenes, just redo later in binary format
@@ -381,6 +449,25 @@ void Scene::load_from_file(const std::string& path)
                     add_object_component<CollisionBoxComponent>(objectIdx, offset, size);
                     break;
                 }
+                case ComponentKind::OrbitingMovement:
+                {
+                    glm::vec3 center = {
+                        std::stof(lGet()),
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+
+                    f32 radius = std::stof(lGet());
+                    f32 height = std::stof(lGet());
+                    f32 speed = std::stof(lGet());
+                    f32 angle = std::stof(lGet());
+                    u32 lookAtCenter = std::stoi(lGet());
+                    u32 orbitingAxis = std::stoi(lGet());
+
+                    add_object_component<OrbitingMovementComponent>(objectIdx, center, radius, height, speed, 
+                        angle, static_cast<bool>(lookAtCenter), static_cast<OrbitingAxis>(orbitingAxis));
+                    break;
+                }
 
                 default:
                     FATAL_CRASH("[SceneLoader]: Unsupported component kind");
@@ -562,6 +649,24 @@ void Scene::save_to_file(const std::string& path)
                     ofs << box->size.x << ' '
                         << box->size.y << ' '
                         << box->size.z << '\n';
+
+                    break;
+                }
+
+                case ComponentKind::OrbitingMovement:
+                {
+                    const auto* orb = static_cast<const OrbitingMovementComponent*>(comp.get());
+
+                    ofs << orb->center.x << ' '
+                        << orb->center.y << ' '
+                        << orb->center.z << '\n';
+
+                    ofs << orb->radius << '\n';
+                    ofs << orb->height << '\n';
+                    ofs << orb->speed << '\n';
+                    ofs << orb->angle << '\n';
+                    ofs << static_cast<u32>(orb->lookAtCenter) << '\n';
+                    ofs << static_cast<u32>(orb->orbitingAxis) << '\n';
 
                     break;
                 }

@@ -18,6 +18,7 @@
 #include "Scene/OrthographicCameraComponent.h"
 #include "Scene/CollisionBoxComponent.h"
 #include "Scene/DistanceFogComponent.h"
+#include "Scene/OrbitingMovementComponent.h"
 
 void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 {
@@ -251,13 +252,12 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 
                 ImGui::Separator();
                 ImGui::TextWrapped(
-                    "Distance fog is applied globally from the active camera. "
-                    "For best results, add this component to the camera object."
+                    "Distance fog is applied globally from the active camera, so attach to camera"
                 );
 
                 ImGui::TreePop();
             }
-            }
+        }
         else if (kind == ComponentKind::FreeCameraController)
         {
             ImGui::Text("no yet implemented");
@@ -362,6 +362,69 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 ImGui::TreePop();
             }
         }
+        else if (kind == ComponentKind::OrbitingMovement)
+        {
+            const bool opened = ImGui::TreeNode("Orbiting Movement");
+
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+
+                ImGui::EndPopup();
+            }
+
+            if (opened)
+            {
+                OrbitingMovementComponent* cast = static_cast<OrbitingMovementComponent*>(comp.get());
+
+                ImGui::DragFloat3("Center", &cast->center.x, 0.01f, -100.0f, 100.0f, "%.2f");
+
+                const char* axes[] =
+                {
+                    "X axis",
+                    "Y axis",
+                    "Z axis"
+                };
+
+                int axis = static_cast<int>(cast->orbitingAxis);
+
+                if (ImGui::Combo("Orbit Axis", &axis, axes, IM_ARRAYSIZE(axes)))
+                {
+                    cast->orbitingAxis = static_cast<OrbitingAxis>(axis);
+                }
+
+                ImGui::DragFloat("Radius", &cast->radius, 0.05f, 0.0f, 1000.0f, "%.2f");
+                ImGui::DragFloat("Height", &cast->height, 0.05f, -1000.0f, 1000.0f, "%.2f");
+
+                ImGui::DragFloat("Speed", &cast->speed, 0.01f, -20.0f, 20.0f, "%.3f");
+                ImGui::DragFloat("Angle", &cast->angle, 0.01f, -10000.0f, 10000.0f, "%.3f");
+
+                ImGui::Checkbox("Look At Center", &cast->lookAtCenter);
+
+                if (cast->radius < 0.0f)
+                    cast->radius = 0.0f;
+
+                ImGui::Separator();
+
+                if (cast->orbitingAxis == OrbitingAxis::Y)
+                {
+                    ImGui::TextDisabled("Y axis: orbit in XZ plane. Height controls Y offset.");
+                }
+                else if (cast->orbitingAxis == OrbitingAxis::X)
+                {
+                    ImGui::TextDisabled("X axis: orbit in YZ plane. Height controls X offset.");
+                }
+                else if (cast->orbitingAxis == OrbitingAxis::Z)
+                {
+                    ImGui::TextDisabled("Z axis: orbit in XY plane. Height controls Z offset.");
+                }
+
+                ImGui::TextDisabled("Speed and angle are in radians.");
+
+                ImGui::TreePop();
+            }
+        }
 
         ImGui::PopID();
     }
@@ -392,7 +455,8 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             "DirectionalLight",
             "PointLight",
             "SpotLight",
-            "CollisionBox"
+            "CollisionBox",
+            "OrbitingMovement"
         };
 
         ImGui::Combo("Component", &selectedItem, items, IM_ARRAYSIZE(items));
@@ -440,6 +504,10 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             else if (selectedKind == ComponentKind::CollisionBox)
             {
                 scene.add_object_component<CollisionBoxComponent>(state.selectedObject);
+            }
+            else if (selectedKind == ComponentKind::OrbitingMovement)
+            {
+                scene.add_object_component<OrbitingMovementComponent>(state.selectedObject);
             }
 
             ImGui::CloseCurrentPopup();

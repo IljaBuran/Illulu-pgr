@@ -1,7 +1,7 @@
 PGR semestral:
 [ ] simple animation
 [x] fog
-[ ] movement on circle, probabily some camera
+[x] movement on circle, probabily some camera
 [ ] utilize FreeCameraController
 [ ] make some collisions with collision boxes
 
