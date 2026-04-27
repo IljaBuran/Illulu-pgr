@@ -18,6 +18,7 @@ using Color = glm::vec3;
 struct RenderItem
 {
     const Mesh* mesh = nullptr;
+    const Object* object = nullptr;
     glm::mat4 pvm{ 1.0f };
     glm::mat4 model{ 1.0f };
     Color color{ 1.0f };
@@ -47,6 +48,11 @@ struct RendererHandles
 
     i32 blendMode = -1;
     i32 alphaCutoff = -1;
+
+    i32 useTextureAtlas = -1;
+    i32 atlasColumns = -1;
+    i32 atlasRows = -1;
+    i32 atlasFrame = -1;
 
     // fog
     i32 fogMode = -1;

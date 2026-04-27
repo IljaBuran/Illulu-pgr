@@ -2,6 +2,7 @@
 #include "EditorApp.h"
 
 #include <algorithm>
+#include <iostream>
 
 #include "EditorState.h"
 #include "MenuBarPanel.h"
@@ -18,6 +19,7 @@
 #include "Scene/PerspectiveCameraComponent.h"
 
 #include "stb/stb_image.h"
+
 
 EditorApp::EditorApp() = default;
 EditorApp::~EditorApp() = default;
@@ -178,6 +180,16 @@ void EditorApp::update(f32 deltaTime)
     cam->yaw += input.mouseDeltaX * mouseSensitivity;
     cam->pitch += input.mouseDeltaY * mouseSensitivity;
     cam->pitch = std::clamp(cam->pitch, -89.0f, 89.0f);
+
+
+    for (const auto& collision : scene.currentCollisions)
+    {
+        if ((collision.first == "Woman" && collision.second == "Player") ||
+            (collision.first == "Player" && collision.second == "Woman"))
+        {
+            std::cout << "Woman-Player collision";
+        }
+    }
 }
 
 void EditorApp::render()

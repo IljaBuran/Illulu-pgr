@@ -13,10 +13,12 @@
 #include "Renderer/IDrawable.h"
 
 #include "glad/glad.h"
+#include "Scene/ICameraComponent.h"
 #include "Scene/DirectionalLightComponent.h"
 #include "Scene/PointLightComponent.h"
 #include "Scene/SpotLightComponent.h"
 #include "Scene/DistanceFogComponent.h"
+#include "Scene/AnimatedTextureComponent.h"
 #include <cmath>
 
 // todo(ilja): ...
@@ -158,6 +160,11 @@ void Renderer::init()
     handles.shininess = basicShader.get_uniform_location("materialShininess");
     handles.blendMode = basicShader.get_uniform_location("materialBlendMode");
     handles.alphaCutoff = basicShader.get_uniform_location("alphaCutoff");
+
+    handles.useTextureAtlas = basicShader.get_uniform_location("useTextureAtlas");
+    handles.atlasColumns = basicShader.get_uniform_location("atlasColumns");
+    handles.atlasRows = basicShader.get_uniform_location("atlasRows");
+    handles.atlasFrame = basicShader.get_uniform_location("atlasFrame");
 
     handles.fogMode = basicShader.get_uniform_location("fogMode");
     handles.fogColor = basicShader.get_uniform_location("fogColor");
@@ -363,6 +370,7 @@ void Renderer::draw()
         {
             RenderItem item;
             item.mesh = &mesh;
+            item.object = &obj;
             item.model = modelMat;
             item.pvm = pvm;
             item.color = modelDrawable->color;
@@ -385,6 +393,23 @@ void Renderer::draw()
         glUniformMatrix4fv(handles.PVM, 1, GL_FALSE, glm::value_ptr(item.pvm));
         glUniformMatrix4fv(handles.M, 1, GL_FALSE, glm::value_ptr(item.model));
         glUniform3fv(handles.color, 1, glm::value_ptr(item.color));
+
+        // todo(ilja): ineffective, but ok for now
+        const AnimatedTextureComponent* anim = item.object->get_component<AnimatedTextureComponent>();
+        if (anim && anim->columns > 0 && anim->rows > 0 && anim->frameCount > 1)
+        {
+            glUniform1i(handles.useTextureAtlas, 1);
+            glUniform1i(handles.atlasColumns, anim->columns);
+            glUniform1i(handles.atlasRows, anim->rows);
+            glUniform1i(handles.atlasFrame, anim->currentFrame);
+        }
+        else
+        {
+            glUniform1i(handles.useTextureAtlas, 0);
+            glUniform1i(handles.atlasColumns, 1);
+            glUniform1i(handles.atlasRows, 1);
+            glUniform1i(handles.atlasFrame, 0);
+        }
 
         apply_material(item.mesh->material);
         item.mesh->draw();

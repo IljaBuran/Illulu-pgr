@@ -92,6 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Scene\AnimatedTextureComponent.h" />
     <ClInclude Include="Source\Scene\DistanceFogComponent.h" />
     <ClInclude Include="Source\Renderer\Material.h" />
     <ClInclude Include="Source\Scene\CollisionBoxComponent.h" />

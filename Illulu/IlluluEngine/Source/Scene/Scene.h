@@ -15,6 +15,7 @@
 #include "Scene/ILightComponent.h"
 #include "Scene/CollisionBoxComponent.h"
 #include "Scene/OrbitingMovementComponent.h"
+#include "Scene/AnimatedTextureComponent.h"
 
 #include "Renderer/IDrawable.h"
 #include "Renderer/Model.h"
@@ -33,6 +34,9 @@ struct Scene
     std::vector<ComponentRef> cachedCollisionBoxes;
 
     std::vector<ComponentRef> cachedOrbiting; // todo(ilja): ...
+    std::vector<ComponentRef> cachedAnimatedTex;
+    
+    std::vector<std::pair<std::string, std::string>> currentCollisions;
 
     void add_model(Model&& model);
     void remove_model(u32 idx);
@@ -43,6 +47,7 @@ struct Scene
     bool remove_object(u32 idx);
 
     void update_orbit_movement(f32 dt);
+    void update_collisions();
     
     template<typename T, typename... Args>
     T& add_object_component(u32 idx, Args&&... args)
@@ -71,6 +76,9 @@ struct Scene
 
         if constexpr (std::is_base_of_v<OrbitingMovementComponent, T>)
             cachedOrbiting.emplace_back(ComponentRef{idx, compIdx});
+        
+        if constexpr (std::is_base_of_v<AnimatedTextureComponent, T>)
+            cachedAnimatedTex.emplace_back(ComponentRef{idx, compIdx});
 
         return *static_cast<T*>(objects[idx].components.back().get());
     }
@@ -102,6 +110,9 @@ struct Scene
 
         if (dynamic_cast<OrbitingMovementComponent*>(raw))
             cachedOrbiting.emplace_back(ComponentRef{idx, compIdx});
+
+        if (dynamic_cast<AnimatedTextureComponent*>(raw))
+            cachedAnimatedTex.emplace_back(ComponentRef{idx, compIdx});
 
         return *raw;
     }
@@ -143,6 +154,10 @@ struct Scene
         {
             std::erase(cachedOrbiting, ComponentRef{objIdx, compIdx});
         }
+        if (dynamic_cast<AnimatedTextureComponent*>(raw))
+        {
+            std::erase(cachedAnimatedTex, ComponentRef{objIdx, compIdx});
+        }
 
         // note(ilja): repair invalidated cache structures
         for (auto& comp : cachedCameras)
@@ -162,6 +177,10 @@ struct Scene
                 if (comp.componentIdx > compIdx)
                     comp.componentIdx--;
         for (auto& comp : cachedOrbiting)
+            if (comp.objectIdx == objIdx)
+                if (comp.componentIdx > compIdx)
+                    comp.componentIdx--;
+        for (auto& comp : cachedAnimatedTex)
             if (comp.objectIdx == objIdx)
                 if (comp.componentIdx > compIdx)
                     comp.componentIdx--;

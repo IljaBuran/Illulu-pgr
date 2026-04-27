@@ -19,6 +19,7 @@
 #include "Scene/CollisionBoxComponent.h"
 #include "Scene/DistanceFogComponent.h"
 #include "Scene/OrbitingMovementComponent.h"
+#include "Scene/AnimatedTextureComponent.h"
 
 void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 {
@@ -425,6 +426,64 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 ImGui::TreePop();
             }
         }
+        else if (kind == ComponentKind::AnimatedTexture)
+        {
+            const bool opened = ImGui::TreeNode("Animated Texture");
+
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+
+                ImGui::EndPopup();
+            }
+
+            if (opened)
+            {
+                AnimatedTextureComponent* cast = static_cast<AnimatedTextureComponent*>(comp.get());
+
+                ImGui::DragInt("Columns", (i32*)&cast->columns, 1.0f, 1, 256);
+                ImGui::DragInt("Rows", (i32*)&cast->rows, 1.0f, 1, 256);
+                ImGui::DragInt("Frame Count", (i32*)&cast->frameCount, 1.0f, 1, 65536);
+
+                const u32 maxFramesInAtlas = cast->columns * cast->rows;
+
+                if (cast->frameCount > maxFramesInAtlas)
+                    cast->frameCount = maxFramesInAtlas;
+
+                if (cast->frameCount < 1)
+                    cast->frameCount = 1;
+
+                ImGui::DragInt("Current Frame", (i32*)&cast->currentFrame, 1.0f, 0, cast->frameCount - 1);
+
+                if (cast->currentFrame < 0)
+                    cast->currentFrame = 0;
+
+                if (cast->currentFrame >= cast->frameCount)
+                    cast->currentFrame = cast->frameCount - 1;
+
+                ImGui::DragFloat("Frame Time", &cast->frameTime, 0.001f, 0.001f, 10.0f, "%.4f");
+
+                if (cast->frameTime < 0.001f)
+                    cast->frameTime = 0.001f;
+
+                ImGui::DragFloat("Timer", &cast->timer, 0.001f, 0.0f, 10.0f, "%.4f");
+
+                if (cast->timer < 0.0f)
+                    cast->timer = 0.0f;
+
+                ImGui::Checkbox("Playing", &cast->playing);
+                ImGui::Checkbox("Loop", &cast->loop);
+
+                ImGui::Separator();
+
+                ImGui::Text("Atlas: %d x %d", cast->columns, cast->rows);
+                ImGui::Text("Max frames in atlas: %d", maxFramesInAtlas);
+                ImGui::Text("Current frame: %d / %d", cast->currentFrame, cast->frameCount - 1);
+
+                ImGui::TreePop();
+            }
+            }
 
         ImGui::PopID();
     }
@@ -456,7 +515,8 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             "PointLight",
             "SpotLight",
             "CollisionBox",
-            "OrbitingMovement"
+            "OrbitingMovement",
+            "AnimatedTexture"
         };
 
         ImGui::Combo("Component", &selectedItem, items, IM_ARRAYSIZE(items));
@@ -508,6 +568,10 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             else if (selectedKind == ComponentKind::OrbitingMovement)
             {
                 scene.add_object_component<OrbitingMovementComponent>(state.selectedObject);
+            }
+            else if (selectedKind == ComponentKind::AnimatedTexture)
+            {
+                scene.add_object_component<AnimatedTextureComponent>(state.selectedObject);
             }
 
             ImGui::CloseCurrentPopup();

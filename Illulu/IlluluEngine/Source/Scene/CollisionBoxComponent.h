@@ -22,15 +22,15 @@ struct CollisionBoxComponent : IComponent
         return {min, max};
     }
     
-    static bool collide(const CollisionBoxComponent& b1, const glm::vec3& b1_pos, 
-                        const CollisionBoxComponent& b2, const glm::vec3& b2_pos)
+    static bool collide(const CollisionBoxComponent& a, const glm::vec3& aPos, 
+                        const CollisionBoxComponent& b, const glm::vec3& bPos)
     {
-        const auto [b1_min, b1_max] = b1.get_min_max(b1_pos);
-        const auto [b2_min, b2_max] = b2.get_min_max(b2_pos);
+        const auto [aMin, aMax] = a.get_min_max(aPos);
+        const auto [bMin, bMax] = b.get_min_max(bPos);
 
-        return b1_min.x <= b2_max.x && b1_max.x >= b2_min.x &&
-               b1_min.y <= b2_max.y && b1_max.y >= b2_min.y &&
-               b1_min.z <= b2_max.z && b1_max.z >= b2_min.z;
+        return aMin.x <= bMax.x && aMax.x >= bMin.x &&
+               aMin.y <= bMax.y && aMax.y >= bMin.y &&
+               aMin.z <= bMax.z && aMax.z >= bMin.z;
     }
 
 

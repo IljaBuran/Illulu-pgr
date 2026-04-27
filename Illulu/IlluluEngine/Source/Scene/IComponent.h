@@ -34,6 +34,9 @@ enum class ComponentKind : i8
     CollisionBox,
 
     OrbitingMovement,
+
+    AnimatedTexture,
+
     COUNT
 };
 
@@ -73,6 +76,8 @@ inline const char* component_kind_to_string(ComponentKind ck)
         return "CollisionBox";
     else if (ck == ComponentKind::OrbitingMovement)
         return "OrbitingMovement";
+    else if (ck == ComponentKind::AnimatedTexture)
+        return "AnimatedTexture";
 
     return "Here only for the compiler bitching, this should not happen otherwise it's gg";
 }
@@ -101,6 +106,8 @@ inline ComponentKind component_kind_from_string(const std::string& s)
         return ComponentKind::CollisionBox;
     else if (s == "OrbitingMovement")
         return ComponentKind::OrbitingMovement;
+    else if (s == "AnimatedTexture")
+        return ComponentKind::AnimatedTexture;
     else
         FATAL_CRASH("[ComponentKind]: Unknown kind");   
 }

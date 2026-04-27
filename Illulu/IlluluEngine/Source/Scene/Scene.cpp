@@ -18,6 +18,7 @@
 #include "Scene/CollisionBoxComponent.h"
 #include "Scene/DistanceFogComponent.h"
 #include "Scene/OrbitingMovementComponent.h"
+#include "Scene/AnimatedTextureComponent.h"
 #include "Core/Window.h"
 #include "Core/Debug.h"
 #include <limits>
@@ -186,16 +187,16 @@ void Scene::update_orbit_movement(f32 dt)
 
         orbit->angle += orbit->speed * dt;
 
-        if (orbit->orbitingAxis == OrbitingAxis::Y)
-        {
-            obj.transform.position.x = orbit->center.x + std::cos(orbit->angle) * orbit->radius;
-            obj.transform.position.y = orbit->center.y + orbit->height;
-            obj.transform.position.z = orbit->center.z + std::sin(orbit->angle) * orbit->radius;
-        }
-        else if (orbit->orbitingAxis == OrbitingAxis::X)
+        if (orbit->orbitingAxis == OrbitingAxis::X)
         {
             obj.transform.position.x = orbit->center.x + orbit->height;
             obj.transform.position.y = orbit->center.y + std::cos(orbit->angle) * orbit->radius;
+            obj.transform.position.z = orbit->center.z + std::sin(orbit->angle) * orbit->radius;
+        }
+        else if (orbit->orbitingAxis == OrbitingAxis::Y)
+        {
+            obj.transform.position.x = orbit->center.x + std::cos(orbit->angle) * orbit->radius;
+            obj.transform.position.y = orbit->center.y + orbit->height;
             obj.transform.position.z = orbit->center.z + std::sin(orbit->angle) * orbit->radius;
         }
         else if (orbit->orbitingAxis == OrbitingAxis::Z)
@@ -234,9 +235,73 @@ void Scene::update_orbit_movement(f32 dt)
     }
 }
 
+void Scene::update_collisions()
+{
+    currentCollisions.clear();
+
+    for (u32 i = 0; i < cachedCollisionBoxes.size(); i++)
+    {
+        const ComponentRef& aRef = cachedCollisionBoxes[i];
+        const Object& aObj = objects[aRef.objectIdx];
+        const CollisionBoxComponent* aComp = static_cast<const CollisionBoxComponent*>(aObj.components[aRef.componentIdx].get());
+
+        for (u32 j = i + 1; j < cachedCollisionBoxes.size(); j++)
+        {
+            const ComponentRef& bRef = cachedCollisionBoxes[j];
+            const Object& bObj = objects[bRef.objectIdx];
+            const CollisionBoxComponent* bComp = static_cast<const CollisionBoxComponent*>(bObj.components[bRef.componentIdx].get());
+
+            if (CollisionBoxComponent::collide(*aComp, aObj.transform.position, *bComp, bObj.transform.position))
+            {
+                currentCollisions.emplace_back(aObj.name, bObj.name);
+            }
+        }
+    }
+}
+
 void Scene::update(f32 dt)
 {
     update_orbit_movement(dt);
+    update_collisions();
+
+    for (const ComponentRef& ref : cachedAnimatedTex)
+    {
+        Object& obj = objects[ref.objectIdx];
+
+        AnimatedTextureComponent* anim =
+            static_cast<AnimatedTextureComponent*>(obj.components[ref.componentIdx].get());
+
+        if (!anim->playing)
+            continue;
+
+        if (anim->frameCount <= 1)
+            continue;
+
+        if (anim->frameTime <= 0.0f)
+            continue;
+
+        anim->timer += dt;
+
+        while (anim->timer >= anim->frameTime)
+        {
+            anim->timer -= anim->frameTime;
+            anim->currentFrame++;
+
+            if (anim->currentFrame >= anim->frameCount)
+            {
+                if (anim->loop)
+                {
+                    anim->currentFrame = 0;
+                }
+                else
+                {
+                    anim->currentFrame = anim->frameCount - 1;
+                    anim->playing = false;
+                    break;
+                }
+            }
+        }
+    }
 }
 
 // todo(ilja): this will be slow for bigger scenes, just redo later in binary format
@@ -469,6 +534,21 @@ void Scene::load_from_file(const std::string& path)
                     break;
                 }
 
+                case ComponentKind::AnimatedTexture:
+                {
+                    u32 columns = std::stoul(lGet());
+                    u32 rows = std::stoul(lGet());
+                    u32 frameCount = std::stoul(lGet());
+                    f32 frameTime = std::stof(lGet());
+
+                    i32 playing = std::stoi(lGet());
+                    i32 loop = std::stoi(lGet());
+
+                    add_object_component<AnimatedTextureComponent>(objectIdx, columns, rows, frameCount, frameTime,
+                        static_cast<bool>(playing), static_cast<bool>(loop));
+                    break;
+                }
+
                 default:
                     FATAL_CRASH("[SceneLoader]: Unsupported component kind");
                 }
@@ -667,6 +747,22 @@ void Scene::save_to_file(const std::string& path)
                     ofs << orb->angle << '\n';
                     ofs << static_cast<u32>(orb->lookAtCenter) << '\n';
                     ofs << static_cast<u32>(orb->orbitingAxis) << '\n';
+
+                    break;
+                }
+
+                case ComponentKind::AnimatedTexture:
+                {
+                    const auto* anim = static_cast<const AnimatedTextureComponent*>(comp.get());
+
+                    ofs << anim->columns << '\n';
+                    ofs << anim->rows << '\n';
+                    ofs << anim->frameCount << '\n';
+
+                    ofs << anim->frameTime << '\n';
+
+                    ofs << static_cast<i32>(anim->playing) << '\n';
+                    ofs << static_cast<i32>(anim->loop) << '\n';
 
                     break;
                 }
