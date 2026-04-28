@@ -10,7 +10,7 @@
 #include "Core/Debug.h"
 
 App::App()
-    : window("Renderer", 1920, 1080)
+    : window("IlluluEditor", 1920, 1080)
 {
 }
 

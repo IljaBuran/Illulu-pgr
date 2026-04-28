@@ -72,13 +72,13 @@ void MenuBarPanel::draw(AppContext& ctx, EditorState& state)
 
         if (ImGui::BeginMenu("View"))
         {
-            static bool collision_boxes = false;
+            static bool collisionBoxes = false;
             static bool normals = false;
 
-            if (ImGui::MenuItem("Show Collision Boxes", nullptr, collision_boxes))
+            if (ImGui::MenuItem("Show Collision Boxes", nullptr, collisionBoxes))
             {
                 ctx.pRenderer->toggle_collision_boxes_view();
-                collision_boxes = !collision_boxes;
+                collisionBoxes = !collisionBoxes;
             }
 
             if (ImGui::MenuItem("Normal view", nullptr, normals))
@@ -100,6 +100,12 @@ void MenuBarPanel::draw(AppContext& ctx, EditorState& state)
             if (ImGui::MenuItem("Recompile all shaders (currently basic, skybox, debugline)"))
             {
                 ctx.pRenderer->reload_shaders();
+            }
+
+            bool enableCulling = ctx.pRenderer->enableCulling;
+            if (ImGui::MenuItem("Enable Culling", nullptr, enableCulling))
+            {
+                ctx.pRenderer->toggle_culling();
             }
 
             ImGui::EndMenu();

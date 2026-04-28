@@ -256,6 +256,14 @@ void Renderer::init()
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     glDisable(GL_BLEND);
+
+    // culling
+    if (enableCulling)
+    {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
+    }
 }
 
 void Renderer::begin_frame()
@@ -387,6 +395,17 @@ void Renderer::draw()
     basicShader.use();
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);
+    
+    if (enableCulling)
+    {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
+    }
+    else
+    {
+        glDisable(GL_CULL_FACE);
+    }
 
     for (const RenderItem& item : opaqueItems)
     {
@@ -425,6 +444,11 @@ void Renderer::draw()
         }
     );
 
+    
+    if (enableCulling)
+        glDisable(GL_CULL_FACE);
+
+    
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_FALSE);
@@ -489,6 +513,9 @@ void Renderer::draw_skybox(u32 cubemapTexture, u32 vao)
     if (!camObj || !cam)
         FATAL_CRASH("[RENDERER]: Current camera object/component missing");
 
+    if (enableCulling)
+        glDisable(GL_CULL_FACE);
+
     glm::mat4 view = glm::mat4(glm::mat3(cam->get_view_matrix(camObj->transform)));
     glm::mat4 PV = cam->get_projection_matrix(get_aspect_ratio()) * view;
 
@@ -508,6 +535,14 @@ void Renderer::draw_skybox(u32 cubemapTexture, u32 vao)
 
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
+
+    if (enableCulling)
+    {
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
+    }
 
     basicShader.use();
     glUniform1i(handles.texDiffuse, 0);

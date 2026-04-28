@@ -124,6 +124,7 @@ struct Renderer
     void draw_collision_boxes();
     glm::mat4 build_collision_box_pvm(const Transform& transform, const CollisionBoxComponent& box) const;
     void reload_shaders();
+    bool enableCulling = false;
     ////////////
 
 
@@ -149,6 +150,10 @@ struct Renderer
     void toggle_collision_boxes_view()
     {
         showCollisionBoxes = !showCollisionBoxes;
+    }
+    void toggle_culling()
+    {
+        enableCulling = !enableCulling;
     }
 
 private:
