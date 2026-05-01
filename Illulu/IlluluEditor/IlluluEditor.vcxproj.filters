@@ -38,6 +38,9 @@
     <ClInclude Include="Source\AssetPanel.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scripts.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">

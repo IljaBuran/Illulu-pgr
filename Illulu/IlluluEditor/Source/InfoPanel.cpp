@@ -19,6 +19,7 @@ void InfoPanel::draw(AppContext& ctx, EditorState& state)
 
     Scene& scene = *ctx.pScene;
     ImGui::Text("Object count: %d", static_cast<int>(scene.objects.size()));
+    ImGui::Text("Selected object ID: %u", state.selectedObject);
 
     if (scene.currentCamera.objectIdx < scene.objects.size())
     {

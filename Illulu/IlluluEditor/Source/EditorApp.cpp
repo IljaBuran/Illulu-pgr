@@ -2,7 +2,6 @@
 #include "EditorApp.h"
 
 #include <algorithm>
-#include <iostream>
 
 #include "EditorState.h"
 #include "MenuBarPanel.h"
@@ -10,16 +9,17 @@
 #include "InspectorPanel.h"
 #include "InfoPanel.h"
 #include "AssetPanel.h"
+#include "Scripts.h"
 
 #include "Core/AppContext.h"
 #include "Core/Window.h"
 #include "Core/Input.h"
+#include "Core/Debug.h"
 #include "Scene/Scene.h"
 #include "Scene/Object.h"
 #include "Scene/PerspectiveCameraComponent.h"
-
-#include "stb/stb_image.h"
-
+#include "Scene/PointLightComponent.h"
+#include "Renderer/ModelDrawable.h"
 
 EditorApp::EditorApp() = default;
 EditorApp::~EditorApp() = default;
@@ -61,7 +61,7 @@ bool EditorApp::init()
 
     glfwSetInputMode(ctx.pWindow->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-    GLFWimage images[1];
+    GLFWimage images[1]{};
     images[0].pixels = stbi_load("Resources/Icons/editor_icon.png", &images[0].width, &images[0].height, 0, 4);
 
     if (images[0].pixels)
@@ -150,7 +150,7 @@ void EditorApp::update(f32 deltaTime)
         return;
 
     PerspectiveCameraComponent* cam =
-        reinterpret_cast<PerspectiveCameraComponent*>(camObj.components[scene.currentCamera.componentIdx].get());
+        static_cast<PerspectiveCameraComponent*>(camObj.components[scene.currentCamera.componentIdx].get());
 
     if (!cam)
         return;
@@ -161,35 +161,106 @@ void EditorApp::update(f32 deltaTime)
     f32 movementSpeed = 9.0f;
     constexpr f32 mouseSensitivity = 0.1f;
 
-    if (input.is_key_down(GLFW_KEY_LEFT_SHIFT))
+    if (scene.currentCamera.objectIdx == 1 || input.is_key_down(GLFW_KEY_LEFT_CONTROL))
+        movementSpeed /= 4;
+    else if (input.is_key_down(GLFW_KEY_LEFT_SHIFT))
         movementSpeed *= 2;
 
-    if (input.is_key_down(GLFW_KEY_W))
-        camObj.transform.position += front * movementSpeed * deltaTime;
-    if (input.is_key_down(GLFW_KEY_S))
-        camObj.transform.position -= front * movementSpeed * deltaTime;
-    if (input.is_key_down(GLFW_KEY_A))
-        camObj.transform.position -= right * movementSpeed * deltaTime;
-    if (input.is_key_down(GLFW_KEY_D))
-        camObj.transform.position += right * movementSpeed * deltaTime;
-    if (input.is_key_down(GLFW_KEY_Q))
-        camObj.transform.position -= cam->worldUp * movementSpeed * deltaTime;
-    if (input.is_key_down(GLFW_KEY_E))
-        camObj.transform.position += cam->worldUp * movementSpeed * deltaTime;
+
+    if (scene.currentCamera.objectIdx != 1)
+    {
+        if (input.is_key_down(GLFW_KEY_W))
+            camObj.transform.position += front * movementSpeed * deltaTime;
+        if (input.is_key_down(GLFW_KEY_S))
+            camObj.transform.position -= front * movementSpeed * deltaTime;
+        if (input.is_key_down(GLFW_KEY_A))
+            camObj.transform.position -= right * movementSpeed * deltaTime;
+        if (input.is_key_down(GLFW_KEY_D))
+            camObj.transform.position += right * movementSpeed * deltaTime;
+    }
+    else
+    {
+        if (input.is_key_down(GLFW_KEY_W))
+            camObj.transform.position += glm::normalize(glm::vec3{front.x, 0, front.z}) * movementSpeed * deltaTime;
+        if (input.is_key_down(GLFW_KEY_S))
+            camObj.transform.position -= glm::normalize(glm::vec3{front.x, 0, front.z}) * movementSpeed * deltaTime;
+        if (input.is_key_down(GLFW_KEY_A))
+            camObj.transform.position -= glm::normalize(glm::vec3{right.x, 0, right.z}) * movementSpeed * deltaTime;
+        if (input.is_key_down(GLFW_KEY_D))
+            camObj.transform.position += glm::normalize(glm::vec3{right.x, 0, right.z}) * movementSpeed * deltaTime;
+    }
 
     cam->yaw += input.mouseDeltaX * mouseSensitivity;
     cam->pitch += input.mouseDeltaY * mouseSensitivity;
     cam->pitch = std::clamp(cam->pitch, -89.0f, 89.0f);
 
 
+    
+
+    static LerpWaterObject lerpWaterObj;
+    static u32 animCnter = 0; // note(ilja): even -> is down, odd -> up
+
+    // note(ilja): hardcoded functionality -> it'll break if scene(object order, names, etc...) changes...
+    bool waterSinkCollision = false;
+    bool womanCollision = false;
+    bool tvCollision = false;
+    bool lightSwitchCollision = false;
     for (const auto& collision : scene.currentCollisions)
     {
-        if ((collision.first == "Woman" && collision.second == "Player") ||
-            (collision.first == "Player" && collision.second == "Woman"))
+        if ((collision.first == "KitchenCollision" && collision.second == "Player") ||
+            (collision.first == "Player" && collision.second == "KitchenCollision"))
         {
-            std::cout << "Woman-Player collision";
+            waterSinkCollision = true;
+            continue;
         }
+        if ((collision.first == "Doggo" && collision.second == "Player") ||
+            (collision.first == "Player" && collision.second == "Doggo"))
+        {
+            womanCollision = true;
+            continue;
+        }
+        if ((collision.first == "animatedTex" && collision.second == "Player") ||
+            (collision.first == "Player" && collision.second == "animatedTex"))
+        {
+            tvCollision = true;
+            continue;
+        }
+        if ((collision.first == "LightSwitch" && collision.second == "Player") ||
+            (collision.first == "Player" && collision.second == "LightSwitch"))
+        {
+            lightSwitchCollision = true;
+            continue;
+        }
+     }
+    if (input.is_key_pressed(GLFW_KEY_F) && !lerpWaterObj.playing && waterSinkCollision)
+    {
+        if (animCnter % 2 == 0)
+        {
+            lerpWaterObj.start(2.0f, static_cast<f32>(glfwGetTime()), 47u, {4.06f, -0.29f, 8.24f}, {4.04f, -0.21f, 8.23f});
+        }
+        else
+        {
+            lerpWaterObj.start(2.0f, static_cast<f32>(glfwGetTime()), 47u, {4.06f, -0.21f, 8.24f}, {4.04f, -0.29f, 8.23f});
+        }
+        animCnter++;
     }
+    if (input.is_key_pressed(GLFW_KEY_F) && womanCollision)
+    {
+        message_box("Doggo", "Baf!").pop_up();
+    }
+    if (input.is_key_pressed(GLFW_KEY_F) && tvCollision)
+    {
+        static bool& vis = scene.objects[37].get_component<ModelDrawable>()->visible;
+        vis = !vis;
+    }
+    if (input.is_key_pressed(GLFW_KEY_F) && lightSwitchCollision)
+    {
+        static f32& lightIntensity = static_cast<PointLightComponent*>(scene.objects[32].components[0].get())->intensity;
+        
+        lightIntensity = lightIntensity == 0.0f ? 2.05f : 0.0f;
+    }
+
+    lerpWaterObj.update(static_cast<f32>(glfwGetTime()), scene);
 }
 
 void EditorApp::render()

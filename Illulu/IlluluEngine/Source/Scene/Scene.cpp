@@ -817,3 +817,13 @@ void Scene::rotate_all_objects_around_origin(const glm::vec3& rotationDeltaDeg)
         obj.transform.rotation += rotationDeltaDeg;
     }
 }
+
+void Scene::move_object_to_camera_location(u32 objIdx)
+{
+    objects[objIdx].transform.position = get_current_camera_object()->transform.position;
+}
+
+void Scene::move_object(u32 objIdx, glm::vec3 pos)
+{
+    objects[objIdx].transform.position = pos;
+}

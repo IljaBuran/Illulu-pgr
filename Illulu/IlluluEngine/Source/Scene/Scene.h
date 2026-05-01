@@ -200,4 +200,6 @@ struct Scene
     const ICameraComponent* get_current_camera_component() const;
 
     void rotate_all_objects_around_origin(const glm::vec3& rotationDeltaDeg);
+    void move_object_to_camera_location(u32 objIdx);
+    void move_object(u32 objIdx, glm::vec3 pos);
 };

@@ -96,8 +96,14 @@ struct RendererHandles
 
 struct SkyboxHandles
 {
-    i32 VP = -1;
+    i32 PV = -1;
     i32 skyboxTex = -1;
+};
+
+struct UIHandles
+{
+    i32 P = -1;
+    i32 uiTex = -1;
 };
 
 struct DebugHandles
@@ -105,7 +111,6 @@ struct DebugHandles
     i32 PVM = -1;
     i32 color = -1;
 };
-
 
 struct Renderer
 {
@@ -126,8 +131,6 @@ struct Renderer
     void reload_shaders();
     bool enableCulling = false;
     ////////////
-
-
 
     void init();
     void begin_frame();

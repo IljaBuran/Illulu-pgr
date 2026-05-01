@@ -14,7 +14,7 @@ std::string read_file_to_string(const char* path)
     {
         std::string errorMsg = "[read_file_to_string]: file couldn't be opened!\npath: ";
         errorMsg += path;
-        FATAL_CRASH(errorMsg.c_str());
+        message_box("read_file_to_string", errorMsg.c_str()).pop_up();
     }
 
     std::stringstream buffer;

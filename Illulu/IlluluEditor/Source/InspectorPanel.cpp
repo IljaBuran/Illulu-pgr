@@ -112,7 +112,7 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 
                 ImGui::Separator();
                 ImGui::ColorEdit3("Tint", &cast->color.x);
-
+                ImGui::Checkbox("Visible", &cast->visible);
                 ImGui::TreePop();
             }
         }
@@ -128,8 +128,8 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 
             if (opened)
             {
-                SkyboxDrawable* cast = static_cast<SkyboxDrawable*>(comp.get());
-                (void)cast;
+                // note(ilja): no usage for now
+                [[maybe_unused]] SkyboxDrawable* cast = static_cast<SkyboxDrawable*>(comp.get());
                 ImGui::TreePop();
             }
         }
@@ -446,10 +446,10 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 ImGui::DragInt("Rows", (i32*)&cast->rows, 1.0f, 1, 256);
                 ImGui::DragInt("Frame Count", (i32*)&cast->frameCount, 1.0f, 1, 65536);
 
-                const u32 maxFramesInAtlas = cast->columns * cast->rows;
+                const u32 maxFrames = cast->columns * cast->rows;
 
-                if (cast->frameCount > maxFramesInAtlas)
-                    cast->frameCount = maxFramesInAtlas;
+                if (cast->frameCount > maxFrames)
+                    cast->frameCount = maxFrames;
 
                 if (cast->frameCount < 1)
                     cast->frameCount = 1;
@@ -478,7 +478,7 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 ImGui::Separator();
 
                 ImGui::Text("Atlas: %d x %d", cast->columns, cast->rows);
-                ImGui::Text("Max frames in atlas: %d", maxFramesInAtlas);
+                ImGui::Text("Max frames in atlas: %d", maxFrames);
                 ImGui::Text("Current frame: %d / %d", cast->currentFrame, cast->frameCount - 1);
 
                 ImGui::TreePop();

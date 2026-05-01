@@ -36,6 +36,7 @@
 #include "nativefiledialog/nfd_glfw3.h"
 
 // ==== stb ====
+#include "stb/stb_image.h"
 
 // ==== Common ====
 #include "Common.h"

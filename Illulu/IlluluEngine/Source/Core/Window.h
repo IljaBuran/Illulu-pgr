@@ -25,7 +25,8 @@ struct Window
 
 private:
 
+    static void _callback_close_window(GLFWwindow* window) noexcept;
     static void _callback_framebuffer_size(GLFWwindow* window, i32 width, i32 height) noexcept;
-    static void _callback_mouse_cursor(GLFWwindow* window, f64 x, f64 y) noexcept;
+    static void _callback_set_mouse_cursor(GLFWwindow* window, f64 x, f64 y) noexcept;
     static void _callback_keyboard(GLFWwindow* window, i32 key, int scancode, int action, int mods) noexcept;
 };

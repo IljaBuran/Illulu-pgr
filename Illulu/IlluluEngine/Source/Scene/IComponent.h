@@ -109,5 +109,5 @@ inline ComponentKind component_kind_from_string(const std::string& s)
     else if (s == "AnimatedTexture")
         return ComponentKind::AnimatedTexture;
     else
-        FATAL_CRASH("[ComponentKind]: Unknown kind");   
+        FATAL_CRASH("[ComponentKind]: Unknown kind");
 }

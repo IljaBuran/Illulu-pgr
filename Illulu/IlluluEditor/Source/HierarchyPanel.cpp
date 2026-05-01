@@ -123,6 +123,11 @@ void HierarchyPanel::draw(AppContext& ctx, EditorState& state)
                     openRenamePopup = true;
                 }
 
+                if (ImGui::MenuItem("Move to camera position"))
+                {
+                    scene.move_object_to_camera_location(state.selectedObject);
+                }
+
                 if (auto camRef = find_camera_component_ref(scene, static_cast<u32>(i)); camRef.has_value())
                 {
                     if (ImGui::MenuItem("Set as current camera"))

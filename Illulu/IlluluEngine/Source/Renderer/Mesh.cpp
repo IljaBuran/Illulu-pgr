@@ -1,14 +1,17 @@
 #include "pch.h"
 
+#include "Common.h"
+
+
 #include "Renderer/Mesh.h"
 
 #include <cstddef>
 #include <glad/glad.h>
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<u32>& indices, const Material& material_)
+Mesh::Mesh(const std::vector<Vertex>& vertices_, const std::vector<u32>& indices_, const Material& material_)
     : material(material_)
 {
-    indexCount = (i32)indices.size();
+    indexCount = (i32)indices_.size();
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -17,8 +20,8 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<u32>& indices,
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
-        static_cast<GLsizeiptr>(vertices.size() * sizeof(Vertex)),
-        vertices.data(),
+        static_cast<GLsizeiptr>(vertices_.size() * sizeof(Vertex)),
+        vertices_.data(),
         GL_STATIC_DRAW
     );
 
@@ -26,8 +29,8 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<u32>& indices,
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        static_cast<GLsizeiptr>(indices.size() * sizeof(u32)),
-        indices.data(),
+        static_cast<GLsizeiptr>(indices_.size() * sizeof(u32)),
+        indices_.data(),
         GL_STATIC_DRAW
     );
 
@@ -107,9 +110,12 @@ void Mesh::draw() const
 
 void Mesh::destroy()
 {
-    if (vao) glDeleteVertexArrays(1, &vao);
-    if (vbo) glDeleteBuffers(1, &vbo);
-    if (ebo) glDeleteBuffers(1, &ebo);
+    if (vao) 
+        glDeleteVertexArrays(1, &vao);
+    if (vbo) 
+        glDeleteBuffers(1, &vbo);
+    if (ebo) 
+        glDeleteBuffers(1, &ebo);
 
     vao = 0;
     vbo = 0;

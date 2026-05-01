@@ -60,7 +60,7 @@ void AssetPanel::import_model(Scene& scene, EditorState& state)
     }
     else if (result == NFD_ERROR)
     {
-        FATAL_CRASH("Unexpected NFD_ERROR while opening model file dialog");
+        message_box("File Dialog Error", "Unexpected NFD_ERROR while opening model file dialog").pop_up();
     }
 }
 

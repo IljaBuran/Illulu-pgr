@@ -2,6 +2,7 @@
 
 #include "Core/Window.h"
 #include "Core/App.h"
+#include "Core/Debug.h"
 
 Window::Window(const char* name, i32 width_, i32 height_) noexcept
     : width(width_), height(height_)
@@ -20,7 +21,7 @@ Window::Window(const char* name, i32 width_, i32 height_) noexcept
 
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1); // vsync
+    glfwSwapInterval(1); // note(ilja): vsync
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         FATAL_CRASH("GLAD failed to initialize!");
@@ -28,10 +29,11 @@ Window::Window(const char* name, i32 width_, i32 height_) noexcept
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwSetWindowUserPointer(window, this);
-    // callbacks
+
+    glfwSetWindowCloseCallback(window, _callback_close_window);
     glfwSetFramebufferSizeCallback(window, _callback_framebuffer_size);
     glfwSetKeyCallback(window, _callback_keyboard);
-    glfwSetCursorPosCallback(window, _callback_mouse_cursor);
+    glfwSetCursorPosCallback(window, _callback_set_mouse_cursor);
 }
 
 Window::~Window()
@@ -54,7 +56,18 @@ void Window::swap_buffers() const noexcept
     glfwSwapBuffers(window);
 }
 
-
+void Window::_callback_close_window(GLFWwindow* window) noexcept
+{
+    using MSG_TYPE = message_box::MSG_BOX_TYPE;
+    if (message_box("Exit", "Do you really wish to exit? (destructive)", MSG_TYPE::OK_NO).pop_up())
+    {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+    else 
+    {
+        glfwSetWindowShouldClose(window, GLFW_FALSE);
+    }
+}
 
 void Window::_callback_framebuffer_size([[maybe_unused]] GLFWwindow* window, i32 width_, i32 height_) noexcept
 {
@@ -76,7 +89,7 @@ void Window::_callback_keyboard(GLFWwindow* glfwWindow, i32 key, [[maybe_unused]
         self->input->set_key(key, false);
 }
 
-void Window::_callback_mouse_cursor(GLFWwindow* glfwWindow, double x, double y) noexcept
+void Window::_callback_set_mouse_cursor(GLFWwindow* glfwWindow, double x, double y) noexcept
 {
     Window* self = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
     if (!self || !self->input)

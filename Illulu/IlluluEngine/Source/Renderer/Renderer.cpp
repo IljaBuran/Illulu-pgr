@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "Common.h"
+
 #include "Renderer/Renderer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -239,7 +241,7 @@ void Renderer::init()
     skyboxShader.load_shader_from_source("Resources/Shaders/Skybox.frag", GL_FRAGMENT_SHADER);
     skyboxShader.create_and_link_program();
 
-    skyboxHandles.VP = skyboxShader.get_uniform_location("VP");
+    skyboxHandles.PV = skyboxShader.get_uniform_location("PV");
     skyboxHandles.skyboxTex = skyboxShader.get_uniform_location("skybox");
 
     debugLineShader.load_shader_from_source("Resources/Shaders/DebugLine.vert", GL_VERTEX_SHADER);
@@ -257,7 +259,6 @@ void Renderer::init()
 
     glDisable(GL_BLEND);
 
-    // culling
     if (enableCulling)
     {
         glEnable(GL_CULL_FACE);
@@ -345,6 +346,7 @@ void Renderer::draw()
     if (!pScene)
         FATAL_CRASH("[RENDERER]: No scene binded during Renderer::draw()!");
 
+    
     std::vector<RenderItem> opaqueItems;
     std::vector<RenderItem> transparentItems;
 
@@ -354,6 +356,9 @@ void Renderer::draw()
     {
         const Object& obj = pScene->objects[compRef.objectIdx];
         const IDrawable* drawable = static_cast<const IDrawable*>(obj.components[compRef.componentIdx].get());
+
+        if (!drawable->visible)
+            continue;
 
         if (drawable->get_component_kind() == ComponentKind::DrawableSkybox)
         {
@@ -523,7 +528,7 @@ void Renderer::draw_skybox(u32 cubemapTexture, u32 vao)
     glDepthMask(GL_FALSE);
 
     skyboxShader.use();
-    glUniformMatrix4fv(skyboxHandles.VP, 1, GL_FALSE, glm::value_ptr(PV));
+    glUniformMatrix4fv(skyboxHandles.PV, 1, GL_FALSE, glm::value_ptr(PV));
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
@@ -538,7 +543,6 @@ void Renderer::draw_skybox(u32 cubemapTexture, u32 vao)
 
     if (enableCulling)
     {
-
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glFrontFace(GL_CCW);

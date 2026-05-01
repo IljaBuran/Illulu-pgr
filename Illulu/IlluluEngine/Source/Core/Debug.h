@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Common.h"
+
 #include "Core/Window.h"
 #include <cstdlib>
 #include <string>
@@ -33,7 +35,7 @@ struct message_box
         COUNT
     };
 
-    static void* hwnd; // using cpp -> leave the bible for sundays
+    static void* hwnd; // note(ilja): leave the bible for sundays
 
     std::string title;
     std::string body;
