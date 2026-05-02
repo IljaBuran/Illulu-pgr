@@ -3,20 +3,24 @@
 
 #include "Common.h"
 
-#include "glm/mat4x4.hpp"
+#include <glm/glm.hpp>
 
 struct Transform;
 
 struct ICameraComponent : IComponent
 {
-    f32 yaw = -90.0f;
-    f32 pitch = 0.0f;
-    glm::vec3 worldUp{0.0f, 1.0f, 0.0f};
+    f32 yaw;
+    f32 pitch;
+    glm::vec3 worldUp;
     
     ICameraComponent() = default;
     
-    ICameraComponent(f32 yaw_, f32 pitch_, const glm::vec3& worldUp_)
-        :  yaw(yaw_), pitch(pitch_), worldUp(worldUp_) {}
+    ICameraComponent(      f32        yaw_     = -90.0f, 
+                           f32        pitch_   = 0.0f, 
+                     const glm::vec3& worldUp_ = glm::vec3{0.0f, 1.0f, 0.0f})
+        :  yaw(yaw_), 
+           pitch(pitch_), 
+           worldUp(worldUp_) {}
 
     virtual ~ICameraComponent() = default;
 

@@ -22,6 +22,7 @@ bool App::init()
     appContext.pRenderer = &renderer;
     appContext.pScene = &scene;
     appContext.pInput = &input;
+    appContext.lastFrameTime = &lastFpsTime;
 
     message_box::set_hwnd(static_cast<void*>(glfwGetWin32Window(window.window)));
 

@@ -35,7 +35,7 @@ struct message_box
         COUNT
     };
 
-    static void* hwnd; // note(ilja): leave the bible for sundays
+    static void* hwnd; // note(ilja): modern c++ guys are having seizure
 
     std::string title;
     std::string body;

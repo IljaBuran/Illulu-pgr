@@ -60,9 +60,6 @@
     <ClInclude Include="Source\Scene\PerspectiveCameraComponent.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scene\FreeCameraControllerComponent.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Scene\ICameraComponent.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
@@ -136,9 +133,6 @@
     </ClCompile>
     <ClCompile Include="Source\Renderer\SkyboxDrawable.cpp">
       <Filter>Source\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\Object.cpp">
-      <Filter>Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Core\Input.cpp">
       <Filter>Source\Core</Filter>

@@ -1,4 +1,5 @@
 #pragma once
+#include "Common.h"
 
 struct Window;
 struct Renderer;
@@ -11,4 +12,6 @@ struct AppContext
     Renderer* pRenderer = nullptr;
     Scene*    pScene    = nullptr;
     Input*    pInput    = nullptr;
+
+    f32* lastFrameTime  = nullptr;
 };

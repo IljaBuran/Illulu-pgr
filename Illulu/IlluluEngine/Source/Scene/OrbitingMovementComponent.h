@@ -25,9 +25,19 @@ struct OrbitingMovementComponent : IComponent
     bool lookAtCenter;
     OrbitingAxis orbitingAxis = OrbitingAxis::Y;
 
-    OrbitingMovementComponent(const glm::vec3& center_ = {0.0f, 0.0f, 0.0f}, f32 radius_ = 5.0f, f32 height_ = 0.0f,
-        f32 speed_ = 1.0f, f32 angle_ = 0.0f, bool lookAtCenter_ = false, OrbitingAxis orbitingAxis_ = OrbitingAxis::Y)
-        : center(center_), radius(radius_), height(height_), speed(speed_), angle(angle_), lookAtCenter(lookAtCenter_), 
+    OrbitingMovementComponent(const glm::vec3&   center_       = glm::vec3(0.0f),
+                                    f32          radius_       = 5.0f, 
+                                    f32          height_       = 0.0f,
+                                    f32          speed_        = 1.0f, 
+                                    f32          angle_        = 0.0f, 
+                                    bool         lookAtCenter_ = false, 
+                                    OrbitingAxis orbitingAxis_ = OrbitingAxis::Y)
+        : center(center_), 
+          radius(radius_), 
+          height(height_), 
+          speed(speed_), 
+          angle(angle_), 
+          lookAtCenter(lookAtCenter_), 
           orbitingAxis(orbitingAxis_) {}
 
     ComponentKind get_component_kind() const override

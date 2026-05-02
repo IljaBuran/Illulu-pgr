@@ -40,6 +40,7 @@
 
 // ==== Common ====
 #include "Common.h"
+#include "Core/Debug.h"
 
 
 #endif //PCH_H

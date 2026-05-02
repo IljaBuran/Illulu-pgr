@@ -651,6 +651,9 @@ bool Renderer::get_directional_light(glm::vec3& outDir, glm::vec3& outColor, f32
     return false;
 }
 
+// todo(ilja): DON'T UPLOAD UNCHANGED LIGHTS EVERY FRAME !!!!!!!!
+    // maybe make flag in editor to signalize a light property has changed
+
 void Renderer::upload_point_lights() const
 {
     if (!pScene)

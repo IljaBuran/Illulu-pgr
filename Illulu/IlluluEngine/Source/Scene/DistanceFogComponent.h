@@ -9,25 +9,31 @@
 enum class DistanceFogType : i32
 {
     Off = 0,
-    Linear = 1,
-    Exp = 2
+    Linear,
+    Exp
 };
 
 struct DistanceFogComponent : IComponent
 {
-    DistanceFogType mode = DistanceFogType::Off;
+    DistanceFogType mode;
 
-    glm::vec3 color = glm::vec3(0.55f, 0.60f, 0.65f);
+    glm::vec3 color;
 
-    f32 start = 20.0f;
-    f32 end = 120.0f;
+    f32 start;
+    f32 end;
 
-    f32 density = 0.025f;
+    f32 density;
 
-    DistanceFogComponent(DistanceFogType mode_ = DistanceFogType::Off, 
-        const glm::vec3& color_ = glm::vec3(0.55f, 0.60f, 0.65f),f32 start_ = 20.0f, 
-        f32 end_ = 120.0f, f32 density_ = 0.025f)
-        : mode(mode_), color(color_), start(start_), end(end_), density(density_) {}
+    DistanceFogComponent(      DistanceFogType mode_ = DistanceFogType::Off, 
+                         const glm::vec3& color_     = glm::vec3(0.50f, 0.50f, 0.50f), 
+                               f32 start_            = 20.0f, 
+                               f32 end_              = 120.0f, 
+                               f32 density_          = 0.02f)
+        : mode(mode_), 
+          color(color_), 
+          start(start_), 
+          end(end_), 
+          density(density_) {}
 
     ComponentKind get_component_kind() const override
     {

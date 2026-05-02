@@ -33,7 +33,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// ==== OpenGL&GLFW ====
+// ==== OpenGL & GLFW ====
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -43,4 +43,4 @@
 #include "Common.h"
 #include "Core/Debug.h"
 
-#endif //PCH_H
+#endif // PCH_H

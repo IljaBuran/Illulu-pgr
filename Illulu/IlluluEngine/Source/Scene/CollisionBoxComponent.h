@@ -11,8 +11,10 @@ struct CollisionBoxComponent : IComponent
     glm::vec3 offset;
     glm::vec3 size;
 
-    CollisionBoxComponent(const glm::vec3& offset_ = {0.0f, 0.0f, 0.0f}, const glm::vec3& size_ = {1.0f, 1.0f, 1.0f})
-        : offset(offset_), size(size_) {}
+    CollisionBoxComponent(const glm::vec3& offset_ = {0.0f, 0.0f, 0.0f}, 
+                          const glm::vec3& size_   = {1.0f, 1.0f, 1.0f})
+        : offset(offset_), 
+          size(size_) {}
     
     std::pair<glm::vec3, glm::vec3> get_min_max(const glm::vec3& objPos) const
     {

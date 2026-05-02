@@ -1,20 +1,14 @@
 PGR semestral:
-[ ] simple animation
+[x] simple animation
 [x] fog
 [x] movement on circle, probabily some camera
 [x] tv with swapping texture
-[ ] utilize FreeCameraController
-[ ] make some collisions with collision boxes
+[!] utilize FreeCameraController
+[x] make some collisions with collision boxes
 
 !To fix!:
 
 [ ] upload_lights (both point and spot) -> very ineffective, make mechanism to track whether there has been a change
 [x] import models: it adds whole path into save file, we only need relative from executable
-[ ] reload_shaders: it fucks up boolean that controls it in editor
+[ ] reload_shaders: fucks up boolean that controls it in editor
 [ ] redo debug views(normal, collisionbox) into separate shaders
-
-App usage:
-
-	Asset importing:
-	
-		The assets need to be in Resources folder relative to executable.

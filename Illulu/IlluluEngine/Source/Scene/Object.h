@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <type_traits>
+#include <vector>
 
 #include "Scene/Transform.h"
 #include "Scene/IComponent.h"
@@ -16,11 +17,12 @@ struct Object
 
     Object() = default;
 
-    Object(Object&&) noexcept = default;
-    Object& operator=(Object&&) noexcept = default;
+    // note(ilja): this needs to stay here, some std::vector operations need it
+    Object(Object&&)                       = default;
+    Object& operator=(Object&&)            = default;
 
-    Object(const Object& other);
-    Object& operator=(const Object& other);
+    Object(const Object& other)            = delete;
+    Object& operator=(const Object& other) = delete;
 
     template<typename T, typename... Args>
     T& add_component(Args&&... args)

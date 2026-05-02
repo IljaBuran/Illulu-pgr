@@ -11,7 +11,6 @@
 #include "Renderer/ModelDrawable.h"
 #include "Renderer/SkyboxDrawable.h"
 #include "Scene/PerspectiveCameraComponent.h"
-#include "Scene/FreeCameraControllerComponent.h"
 #include "Scene/DirectionalLightComponent.h"
 #include "Scene/PointLightComponent.h"
 #include "Scene/SpotLightComponent.h"
@@ -259,16 +258,6 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 ImGui::TreePop();
             }
         }
-        else if (kind == ComponentKind::FreeCameraController)
-        {
-            ImGui::Text("no yet implemented");
-            if (ImGui::BeginPopupContextItem("component_ctx"))
-            {
-                if (ImGui::MenuItem("Delete component"))
-                    deleteCompIdx = compIdx;
-                ImGui::EndPopup();
-            }
-        }
         else if (kind == ComponentKind::DirectionalLight)
         {
             const bool opened = ImGui::TreeNode("Directional Light");
@@ -509,7 +498,6 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             "DrawableSkybox",
             "PerspectiveCamera",
             "OrthographicCamera",
-            "FreeCameraController",
             "DistanceFog",
             "DirectionalLight",
             "PointLight",
@@ -540,10 +528,6 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             else if (selectedKind == ComponentKind::OrthographicCamera)
             {
                 scene.add_object_component<OrthographicCameraComponent>(state.selectedObject);
-            }
-            else if (selectedKind == ComponentKind::FreeCameraController)
-            {
-                scene.add_object_component<FreeCameraControllerComponent>(state.selectedObject);
             }
             else if (selectedKind == ComponentKind::DistanceFog)
             {

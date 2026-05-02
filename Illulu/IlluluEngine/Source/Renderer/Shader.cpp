@@ -6,7 +6,6 @@
 #include "glad/glad.h"
 
 #include <string>
-// todo
 #include <iostream>
 #include <cassert>
 

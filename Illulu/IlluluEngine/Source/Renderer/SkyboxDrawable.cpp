@@ -18,37 +18,6 @@ SkyboxDrawable::~SkyboxDrawable()
     destroy();
 }
 
-SkyboxDrawable::SkyboxDrawable(SkyboxDrawable&& other) noexcept
-{
-    faces = std::move(other.faces);
-    cubemapTexture = other.cubemapTexture;
-    vao = other.vao;
-    vbo = other.vbo;
-
-    other.cubemapTexture = 0;
-    other.vao = 0;
-    other.vbo = 0;
-}
-
-SkyboxDrawable& SkyboxDrawable::operator=(SkyboxDrawable&& other) noexcept
-{
-    if (this != &other)
-    {
-        destroy();
-
-        faces = std::move(other.faces);
-        cubemapTexture = other.cubemapTexture;
-        vao = other.vao;
-        vbo = other.vbo;
-
-        other.cubemapTexture = 0;
-        other.vao = 0;
-        other.vbo = 0;
-    }
-
-    return *this;
-}
-
 void SkyboxDrawable::draw(Renderer& renderer, [[maybe_unused]] const Transform& transform) const
 {
     renderer.draw_skybox(cubemapTexture, vao);

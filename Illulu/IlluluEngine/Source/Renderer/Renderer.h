@@ -54,19 +54,16 @@ struct RendererHandles
     i32 atlasRows = -1;
     i32 atlasFrame = -1;
 
-    // fog
     i32 fogMode = -1;
     i32 fogColor = -1;
     i32 fogStart = -1;
     i32 fogEnd = -1;
     i32 fogDensity = -1;
 
-    // directional light
     i32 dirLightDirection = -1;
     i32 dirLightColor = -1;
     i32 dirLightIntensity = -1;
 
-    // pointlight
     i32 pointLightCount = -1;
     i32 pointLightPositions[MAX_POINT_LIGHTS]{};
     i32 pointLightColors[MAX_POINT_LIGHTS]{};
@@ -75,9 +72,7 @@ struct RendererHandles
     i32 pointLightLinears[MAX_POINT_LIGHTS]{};
     i32 pointLightQuadratics[MAX_POINT_LIGHTS]{};
 
-    // spotlight
     i32 spotLightCount = -1;
-
     i32 spotLightPositions[MAX_SPOT_LIGHTS]{};
     i32 spotLightDirections[MAX_SPOT_LIGHTS]{};
     i32 spotLightColors[MAX_SPOT_LIGHTS]{};
@@ -141,7 +136,7 @@ struct Renderer
     void draw_model(u32 modelIdx, const Color& color, const Transform& transform);
     void draw_skybox(u32 cubemapTexture, u32 vao);
 
-    // todo(ilja): decide
+    // todo(ilja): also decide whether it stays here
     AppContext* appContext;
 
     void toggle_normal_view() const

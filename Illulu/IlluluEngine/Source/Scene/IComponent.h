@@ -22,8 +22,6 @@ enum class ComponentKind : i8
 
     PerspectiveCamera,
     OrthographicCamera,
-
-    FreeCameraController,
     
     DistanceFog,
 
@@ -62,8 +60,6 @@ inline const char* component_kind_to_string(ComponentKind ck)
         return "PerspectiveCamera";
     else if (ck == ComponentKind::OrthographicCamera)
         return "OrthographicCamera";
-    else if (ck == ComponentKind::FreeCameraController)
-        return "FreeCameraController";
     else if (ck == ComponentKind::DistanceFog)
         return "DistanceFog";
     else if (ck == ComponentKind::DirectionalLight)
@@ -92,8 +88,6 @@ inline ComponentKind component_kind_from_string(const std::string& s)
         return ComponentKind::PerspectiveCamera;
     else if (s == "OrthographicCamera")
         return ComponentKind::OrthographicCamera;
-    else if (s == "FreeCameraController")
-        return ComponentKind::FreeCameraController;
     else if (s == "DirectionalLight")
         return ComponentKind::DirectionalLight;
     else if (s == "DistanceFog")

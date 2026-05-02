@@ -2,12 +2,12 @@
 
 #include "Scene/Scene.h"
 
-#include <algorithm>
 #include <fstream>
 #include <string>
 #include <memory>
+#include <limits>
+#include <cmath>
 
-#include "Renderer/IDrawable.h"
 #include "Renderer/ModelDrawable.h"
 #include "Renderer/SkyboxDrawable.h"
 #include "Scene/PerspectiveCameraComponent.h"
@@ -19,9 +19,7 @@
 #include "Scene/DistanceFogComponent.h"
 #include "Scene/OrbitingMovementComponent.h"
 #include "Scene/AnimatedTextureComponent.h"
-#include "Core/Window.h"
 #include "Core/Debug.h"
-#include <limits>
 
 void Scene::add_model(Model&& model)
 {
@@ -104,7 +102,7 @@ bool Scene::remove_object(u32 idx)
     if (idx >= objects.size())
         return false;
 
-    // todo(ilja): temporary solution
+    // todo(ilja): not optimal
     if (idx == currentCamera.objectIdx)
     {
         message_box("Editor", "Can't remove currently active camera").pop_up();
@@ -422,12 +420,6 @@ void Scene::load_from_file(const std::string& path)
                     add_object_component<OrthographicCameraComponent>(objectIdx, yaw, pitch, worldUp, orthoHeight,
                         nearPlane, farPlane);
                     break;
-                }
-
-
-                case ComponentKind::FreeCameraController:
-                {
-                    FATAL_CRASH("NOT IMPLEMENTED");
                 }
 
                 case ComponentKind::DistanceFog:

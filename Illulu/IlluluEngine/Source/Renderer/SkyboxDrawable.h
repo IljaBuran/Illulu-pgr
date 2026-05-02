@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Common.h"
+
 #include <array>
 #include <string>
 #include <memory>
 
 #include "Renderer/IDrawable.h"
-#include "Common.h"
 
 struct SkyboxDrawable : IDrawable
 {
@@ -18,12 +19,6 @@ struct SkyboxDrawable : IDrawable
     SkyboxDrawable() = delete;
     explicit SkyboxDrawable(const std::array<std::string, 6>& faces_);
     ~SkyboxDrawable();
-
-    SkyboxDrawable(const SkyboxDrawable&) = delete;
-    SkyboxDrawable& operator=(const SkyboxDrawable&) = delete;
-
-    SkyboxDrawable(SkyboxDrawable&& other) noexcept;
-    SkyboxDrawable& operator=(SkyboxDrawable&& other) noexcept;
 
     void draw(Renderer& renderer, const Transform& transform) const override;
 
