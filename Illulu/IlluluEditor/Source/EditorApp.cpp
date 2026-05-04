@@ -121,7 +121,7 @@ void EditorApp::update(f32 deltaTime)
     Input& input = *ctx.pInput;
     Scene& scene = *ctx.pScene;
 
-    if (input.is_key_pressed(GLFW_KEY_SPACE) && !state->locked)
+    if (input.is_key_pressed(GLFW_KEY_1) && !state->locked)
     {
         if (!state->editMode)
         {
@@ -159,7 +159,7 @@ void EditorApp::update(f32 deltaTime)
     glm::vec3 right = glm::normalize(glm::cross(front, cam->worldUp));
 
     f32 movementSpeed = 9.0f;
-    constexpr f32 mouseSensitivity = 0.1f;
+    const f32 mouseSensitivity = 0.1f;
 
     if (scene.currentCamera.objectIdx == 1 || input.is_key_down(GLFW_KEY_LEFT_CONTROL))
         movementSpeed /= 4;
