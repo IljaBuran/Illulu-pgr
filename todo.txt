@@ -1,10 +1,11 @@
 PGR semestral:
-[x] simple animation
-[x] fog
-[x] movement on circle, probabily some camera
-[x] tv with swapping texture
 [!] utilize FreeCameraController
-[x] make some collisions with collision boxes
+[ ] add also rotation to animation
+[ ] apply fog also to skybox shader
+[ ] font + hand icon
+[ ] collision to not get out of the apartment
+[ ] picking
+[ ] doxygen
 
 !To fix!:
 

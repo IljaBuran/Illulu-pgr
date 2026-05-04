@@ -123,19 +123,29 @@ void EditorApp::update(f32 deltaTime)
 
     if (input.is_key_pressed(GLFW_KEY_1) && !state->locked)
     {
-        if (!state->editMode)
-        {
-            ImGuiIO& io = ImGui::GetIO();
-            io.ClearInputKeys();
-            io.ClearInputMouse();
-        }
+        const bool switchingToEditMode = !state->editMode;
+
         state->editMode = !state->editMode;
         input.mouseBegin = true;
 
-        if (state->editMode)
+        ImGuiIO& io = ImGui::GetIO();
+
+        if (switchingToEditMode)
+        {
+            io.ClearEventsQueue();
+            io.ClearInputKeys();
+            io.ClearInputMouse();
+
             glfwSetInputMode(ctx.pWindow->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
         else
+        {
+            io.ClearEventsQueue();
+            io.ClearInputKeys();
+            io.ClearInputMouse();
+
             glfwSetInputMode(ctx.pWindow->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
     }
 
     if (state->editMode)
