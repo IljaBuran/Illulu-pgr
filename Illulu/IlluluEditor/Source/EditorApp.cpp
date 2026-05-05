@@ -2,6 +2,7 @@
 #include "EditorApp.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "EditorState.h"
 #include "MenuBarPanel.h"
@@ -20,6 +21,7 @@
 #include "Scene/PerspectiveCameraComponent.h"
 #include "Scene/PointLightComponent.h"
 #include "Renderer/ModelDrawable.h"
+#include "Renderer/Renderer.h"
 
 EditorApp::EditorApp() = default;
 EditorApp::~EditorApp() = default;
@@ -117,11 +119,26 @@ void EditorApp::shutdown()
 
 void EditorApp::update(f32 deltaTime)
 {
+    // note(ilja): this is such a mess...
     AppContext& ctx = engine.get_context();
     Input& input = *ctx.pInput;
     Scene& scene = *ctx.pScene;
+    Renderer& renderer = *ctx.pRenderer;
 
-    if (input.is_key_pressed(GLFW_KEY_1) && !state->locked)
+
+    // note(ilja): picking
+    if (input.is_key_pressed(GLFW_KEY_T) && state->editMode && !state->locked)
+    {
+        i32 pickedObjectIdx = renderer.pick_object(input.mouseX, input.mouseY);
+
+        if (pickedObjectIdx >= 0)
+        {
+            state->selectedObject = pickedObjectIdx;
+        }
+    }
+
+    // note(ilja): switch between editMode
+    if (input.is_key_pressed(GLFW_KEY_E) && !state->locked)
     {
         const bool switchingToEditMode = !state->editMode;
 
@@ -176,6 +193,8 @@ void EditorApp::update(f32 deltaTime)
     else if (input.is_key_down(GLFW_KEY_LEFT_SHIFT))
         movementSpeed *= 2;
 
+    // note(ilja): store previous position in case we collide with world boundary
+    glm::vec3 oldPos = camObj.transform.position;
 
     if (scene.currentCamera.objectIdx != 1)
     {
@@ -188,7 +207,7 @@ void EditorApp::update(f32 deltaTime)
         if (input.is_key_down(GLFW_KEY_D))
             camObj.transform.position += right * movementSpeed * deltaTime;
     }
-    else
+    else // note(ilja): hardcode for camera in obj 1 to move like person would
     {
         if (input.is_key_down(GLFW_KEY_W))
             camObj.transform.position += glm::normalize(glm::vec3{front.x, 0, front.z}) * movementSpeed * deltaTime;
@@ -204,17 +223,19 @@ void EditorApp::update(f32 deltaTime)
     cam->pitch += input.mouseDeltaY * mouseSensitivity;
     cam->pitch = std::clamp(cam->pitch, -89.0f, 89.0f);
 
-
+    scene.update_collisions();
     
 
     static LerpWaterObject lerpWaterObj;
     static u32 animCnter = 0; // note(ilja): even -> is down, odd -> up
 
+    // note(ilja): collision checking
     // note(ilja): hardcoded functionality -> it'll break if scene(object order, names, etc...) changes...
     bool waterSinkCollision = false;
     bool womanCollision = false;
     bool tvCollision = false;
     bool lightSwitchCollision = false;
+    bool worldBoundaryCollision = false;
     for (const auto& collision : scene.currentCollisions)
     {
         if ((collision.first == "KitchenCollision" && collision.second == "Player") ||
@@ -241,16 +262,57 @@ void EditorApp::update(f32 deltaTime)
             lightSwitchCollision = true;
             continue;
         }
-     }
+        if (true)
+        {
+            if ((collision.first == "Wall1" && collision.second == "Player") ||
+                (collision.first == "Player" && collision.second == "Wall1"))
+            {
+                worldBoundaryCollision = true;
+                continue;
+            }
+            if ((collision.first == "Wall2" && collision.second == "Player") ||
+                (collision.first == "Player" && collision.second == "Wall2"))
+            {
+                worldBoundaryCollision = true;
+                continue;
+            }
+            if ((collision.first == "Wall3" && collision.second == "Player") ||
+                (collision.first == "Player" && collision.second == "Wall3"))
+            {
+                worldBoundaryCollision = true;
+                continue;
+            }
+            if ((collision.first == "Wall4" && collision.second == "Player") ||
+                (collision.first == "Player" && collision.second == "Wall4"))
+            {
+                worldBoundaryCollision = true;
+                continue;
+            }
+            if ((collision.first == "KitchenIsland" && collision.second == "Player") ||
+                (collision.first == "Player" && collision.second == "KitchenIsland"))
+            {
+                worldBoundaryCollision = true;
+                continue;
+            }
+            if ((collision.first == "BedCollision" && collision.second == "Player") ||
+                (collision.first == "Player" && collision.second == "BedCollision"))
+            {
+                worldBoundaryCollision = true;
+                continue;
+            }
+        }
+    }
+    
+    // note(ilja): responsed to collisions
     if (input.is_key_pressed(GLFW_KEY_F) && !lerpWaterObj.playing && waterSinkCollision)
     {
         if (animCnter % 2 == 0)
         {
-            lerpWaterObj.start(2.0f, static_cast<f32>(glfwGetTime()), 47u, {4.06f, -0.29f, 8.24f}, {4.04f, -0.21f, 8.23f});
+            lerpWaterObj.start(2.0f, static_cast<f32>(glfwGetTime()), 47u, {8.63f, -0.29f, 2.96f}, {8.63f, -0.21f, 2.96f});
         }
         else
         {
-            lerpWaterObj.start(2.0f, static_cast<f32>(glfwGetTime()), 47u, {4.06f, -0.21f, 8.24f}, {4.04f, -0.29f, 8.23f});
+            lerpWaterObj.start(2.0f, static_cast<f32>(glfwGetTime()), 47u, {8.63f, -0.21f, 2.96f}, {8.63f, -0.29f, 2.96f});
         }
         animCnter++;
     }
@@ -269,6 +331,11 @@ void EditorApp::update(f32 deltaTime)
         
         lightIntensity = lightIntensity == 0.0f ? 2.05f : 0.0f;
     }
+    if (worldBoundaryCollision)
+    {
+        camObj.transform.position = oldPos;
+    }
+
 
     lerpWaterObj.update(static_cast<f32>(glfwGetTime()), scene);
 }

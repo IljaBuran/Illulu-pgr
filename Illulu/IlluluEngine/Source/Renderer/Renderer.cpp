@@ -253,6 +253,14 @@ void Renderer::init()
 
     init_debug_cube();
 
+
+    pickingShader.load_shader_from_source("Resources/Shaders/Picking.vert", GL_VERTEX_SHADER);
+    pickingShader.load_shader_from_source("Resources/Shaders/Picking.frag", GL_FRAGMENT_SHADER);
+    pickingShader.create_and_link_program();
+
+    pickingHandles.PVM = pickingShader.get_uniform_location("PVM");
+    pickingHandles.objectId = pickingShader.get_uniform_location("objectId");
+
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -321,7 +329,7 @@ void Renderer::begin_frame()
         glUniform3fv(handles.dirLightColor, 1, glm::value_ptr(col));
         glUniform1f(handles.dirLightIntensity, intens);
     }
-    else
+    else // note(ilja): i'll just make default one as fallback if there doesn't exist any direcitonal light
     {
         glm::vec3 fallbackDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
         glm::vec3 fallbackColor(1.0f, 1.0f, 1.0f);
@@ -345,7 +353,6 @@ void Renderer::draw()
 {
     if (!pScene)
         FATAL_CRASH("[RENDERER]: No scene binded during Renderer::draw()!");
-
     
     std::vector<RenderItem> opaqueItems;
     std::vector<RenderItem> transparentItems;
@@ -449,10 +456,8 @@ void Renderer::draw()
         }
     );
 
-    
     if (enableCulling)
         glDisable(GL_CULL_FACE);
-
     
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -564,6 +569,103 @@ glm::vec3 Renderer::get_object_forward_x(const Transform& transform) const
     glm::vec3 worldForward = glm::vec3(R * glm::vec4(localForward, 0.0f));
 
     return glm::normalize(worldForward);
+}
+
+i32 Renderer::pick_object(f32 mouseX, f32 mouseY)
+{
+    if (!pScene)
+        return -1;
+
+    if (!appContext || !appContext->pWindow)
+        return -1;
+
+    //const i32 width = appContext->pWindow->width;
+    const i32 height = appContext->pWindow->height;
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    pickingShader.use();
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+
+    for (const auto& compRef : pScene->cachedDrawables)
+    {
+        if (compRef.objectIdx >= pScene->objects.size())
+            continue;
+
+        const Object& obj = pScene->objects[compRef.objectIdx];
+
+        const IDrawable* drawable =
+            static_cast<const IDrawable*>(obj.components[compRef.componentIdx].get());
+
+        if (!drawable->visible)
+            continue;
+
+        if (drawable->get_component_kind() != ComponentKind::DrawableModel)
+            continue;
+
+        const ModelDrawable* modelDrawable =
+            static_cast<const ModelDrawable*>(drawable);
+
+        if (modelDrawable->modelIdx >= pScene->models.size())
+            continue;
+
+        const Model& model = pScene->models[modelDrawable->modelIdx];
+
+        glm::mat4 pvm = build_pvm(obj.transform);
+
+        glUniformMatrix4fv(
+            pickingHandles.PVM,
+            1,
+            GL_FALSE,
+            glm::value_ptr(pvm)
+        );
+
+        u32 pickingId = compRef.objectIdx + 1;
+
+        glUniform1f(
+            pickingHandles.objectId,
+            static_cast<f32>(pickingId)
+        );
+
+        for (const Mesh& mesh : model.meshes)
+        {
+            mesh.draw();
+        }
+    }
+
+    glFlush();
+    glFinish();
+
+    unsigned char data[4] = {};
+
+    i32 readX = static_cast<i32>(mouseX);
+    i32 readY = height - static_cast<i32>(mouseY) - 1;
+
+    glReadPixels(
+        readX,
+        readY,
+        1,
+        1,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        data
+    );
+
+    u32 pickedId = data[0];
+
+    basicShader.use();
+
+    if (pickedId == 0)
+        return -1;
+
+    u32 objectIdx = pickedId - 1;
+
+    if (objectIdx >= pScene->objects.size())
+        return -1;
+
+    return static_cast<i32>(objectIdx);
 }
 
 f32 Renderer::get_aspect_ratio() const

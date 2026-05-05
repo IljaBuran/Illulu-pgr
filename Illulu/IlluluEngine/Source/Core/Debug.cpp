@@ -1,4 +1,7 @@
 #include "pch.h"
+
+#include "Common.h"
+
 #include "Core/Debug.h"
 
 void* message_box::hwnd = nullptr;

@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "Common.h"
+
 #include "Core/Filesystem.h"
 #include "Renderer/Shader.h"
 

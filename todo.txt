@@ -1,11 +1,13 @@
 PGR semestral:
 [!] utilize FreeCameraController
-[ ] add also rotation to animation
+[ ] doxygen
+[ ] collision to not get out of the apartment
 [ ] apply fog also to skybox shader
 [ ] font + hand icon
-[ ] collision to not get out of the apartment
+
 [ ] picking
-[ ] doxygen
+
+[ ] add also rotation to animation
 
 !To fix!:
 

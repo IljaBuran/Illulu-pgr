@@ -6,11 +6,13 @@
 #include "glm/vec3.hpp"
 
 #include "Renderer/Shader.h"
+#include "Renderer/Material.h"
 #include "Scene/Scene.h"
 #include "Scene/Object.h"
 #include "Scene/Transform.h"
+#include "Scene/CollisionBoxComponent.h"
 
-// todo(ilja): decide
+// todo(ilja): decide later whether appContext should be here...
 #include "Core/AppContext.h"
 
 using Color = glm::vec3;
@@ -95,10 +97,10 @@ struct SkyboxHandles
     i32 skyboxTex = -1;
 };
 
-struct UIHandles
+struct PickingHandles
 {
-    i32 P = -1;
-    i32 uiTex = -1;
+    i32 PVM = -1;
+    i32 objectId = -1;
 };
 
 struct DebugHandles
@@ -111,10 +113,12 @@ struct Renderer
 {
     Shader basicShader;
     Shader skyboxShader;
+    Shader pickingShader;
     RendererHandles handles;
     SkyboxHandles skyboxHandles;
+    PickingHandles pickingHandles;
 
-    // todo(ilja): think through wherther leave it here
+    // todo(ilja): think through wherther leave it here, this is more editor-addon specific, than base renderer logic
     Shader debugLineShader;
     DebugHandles debugHandles;
     u32 debugCubeVao = 0;
@@ -153,6 +157,8 @@ struct Renderer
     {
         enableCulling = !enableCulling;
     }
+
+    i32 pick_object(f32 mouseX, f32 mouseY);
 
 private:
     const Scene* pScene = nullptr;

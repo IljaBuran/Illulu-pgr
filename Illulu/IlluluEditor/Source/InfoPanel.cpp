@@ -14,7 +14,6 @@ void InfoPanel::draw(AppContext& ctx, EditorState& state)
 
     ImGui::Begin("Info");
 
-    ImGui::Text("FPS: %u", *ctx.lastFrameTime / 1000.0);
     ImGui::Text("Mouse position: (%f, %f)", ctx.pInput->mouseX, ctx.pInput->mouseY);
 
     Scene& scene = *ctx.pScene;

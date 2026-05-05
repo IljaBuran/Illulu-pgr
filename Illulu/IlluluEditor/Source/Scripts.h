@@ -8,12 +8,12 @@
 
 struct LerpWaterObject
 {
-    u32 objIdx;
-    glm::vec3 startPos;
-    glm::vec3 endPos;
-    f32 startTime;
-    f32 duration;
-    f32 expectedEndTime;
+    u32 objIdx{};
+    glm::vec3 startPos{};
+    glm::vec3 endPos{};
+    f32 startTime{};
+    f32 duration{};
+    f32 expectedEndTime{};
     bool playing = false;
 
     void start(f32 duration_, f32 startTime_, u32 objIdx_, glm::vec3 startPos_, glm::vec3 endPos_)

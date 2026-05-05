@@ -10,7 +10,7 @@
 #include "Core/Debug.h"
 
 App::App()
-    : window("IlluluEditor", 1920, 1080)
+    : window("IlluluEditor - [HARDCODED: Don't modify scene]", 1920, 1080)
 {
 }
 
