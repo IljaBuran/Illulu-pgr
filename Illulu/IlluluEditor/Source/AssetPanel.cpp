@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       AssetPanel.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements the asset panel for importing, listing, selecting, removing, and spawning model assets.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 #include "AssetPanel.h"
 

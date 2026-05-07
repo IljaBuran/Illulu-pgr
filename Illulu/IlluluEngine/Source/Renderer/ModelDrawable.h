@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       ModelDrawable.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines a drawable model component with model index and color.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #pragma once
 
 #include "Common.h"

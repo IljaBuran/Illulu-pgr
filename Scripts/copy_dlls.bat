@@ -28,6 +28,9 @@ set "ROOT=%~dp0.."
 set "DST=%ROOT%\x64\%CONFIG%"
 
 robocopy "%ROOT%\ThirdParty\assimp" "%DST%" "assimp-vc145-mt.dll"
+if %ERRORLEVEL% LSS 8 set ERRORLEVEL=0
+
 robocopy "%ROOT%\ThirdParty\glfw" "%DST%" "glfw3.dll"
+if %ERRORLEVEL% LSS 8 set ERRORLEVEL=0
 
 endlocal

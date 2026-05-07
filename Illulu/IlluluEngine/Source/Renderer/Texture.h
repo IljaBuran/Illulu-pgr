@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Texture.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Declares helper functions for loading 2D textures and cubemaps.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include <string>
 #include <array>
 #include "Common.h"

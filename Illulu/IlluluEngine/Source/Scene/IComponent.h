@@ -1,11 +1,21 @@
 #pragma once
+
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       IComponent.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the base component interface, component references, and component kind conversion helpers.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Common.h"
 #include <numeric>
 #include <memory>
 #include <string>
+#include <limits>
 #include "Core/Debug.h"
 #include "Scene/IComponent.h"
-#include <limits>
 
 struct ComponentRef
 {
@@ -34,6 +44,7 @@ enum class ComponentKind : i8
     OrbitingMovement,
 
     AnimatedTexture,
+    FloatingTexture,
 
     COUNT
 };
@@ -74,6 +85,8 @@ inline const char* component_kind_to_string(ComponentKind ck)
         return "OrbitingMovement";
     else if (ck == ComponentKind::AnimatedTexture)
         return "AnimatedTexture";
+    else if (ck == ComponentKind::FloatingTexture)
+        return "FloatingTexture";
 
     return "Here only for the compiler bitching, this should not happen otherwise it's gg";
 }
@@ -102,6 +115,8 @@ inline ComponentKind component_kind_from_string(const std::string& s)
         return ComponentKind::OrbitingMovement;
     else if (s == "AnimatedTexture")
         return ComponentKind::AnimatedTexture;
+    else if (s == "FloatingTexture")
+        return ComponentKind::FloatingTexture;
     else
         FATAL_CRASH("[ComponentKind]: Unknown kind");
 }

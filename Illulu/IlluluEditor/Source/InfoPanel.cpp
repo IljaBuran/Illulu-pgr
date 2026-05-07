@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       InfoPanel.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements the editor information panel for displaying input, scene, and camera status.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 #include "InfoPanel.h"
 

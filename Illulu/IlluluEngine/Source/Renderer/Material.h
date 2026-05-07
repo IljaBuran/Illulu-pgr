@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Material.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines material properties used for textured and lit mesh rendering.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #pragma once
 #include "Common.h"
 #include <glm/glm.hpp>

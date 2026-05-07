@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Shader.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements OpenGL shader loading, compilation, linking, reloading, and error checking.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 #include "Common.h"

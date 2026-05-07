@@ -1,7 +1,13 @@
 #pragma once
 
-//#include <glad/glad.h>
-//#include <GLFW/glfw3.h>
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Window.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines a GLFW window wrapper with input handling and event callbacks.
+ */
+ //-----------------------------------------------------------------------------------------
 
 struct GLFWwindow;
 

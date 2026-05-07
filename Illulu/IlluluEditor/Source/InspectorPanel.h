@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       InspectorPanel.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the editor inspector panel for viewing and editing selected object properties.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #pragma once
 
 #include "IEditorPanel.h"

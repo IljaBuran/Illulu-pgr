@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       CollisionBoxComponent.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines an axis-aligned collision box component for simple object collision checks.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Scene/IComponent.h"
 #include "Common.h"
 

@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Window.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements GLFW window creation, event polling, buffer swapping, and input callbacks.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 #include "Core/Window.h"

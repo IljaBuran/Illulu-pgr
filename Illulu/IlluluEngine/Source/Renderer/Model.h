@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Model.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines model loading structures for importing meshes and materials with Assimp.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #pragma once
 
 #include "Common.h"

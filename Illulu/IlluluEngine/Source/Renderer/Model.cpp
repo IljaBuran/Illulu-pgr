@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Model.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements model loading, mesh processing, material loading, and texture caching.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 #include <filesystem>

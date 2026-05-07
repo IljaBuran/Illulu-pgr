@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Debug.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines crash reporting and message box utilities for debugging.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Common.h"
 
 #include "Core/Window.h"

@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       HierarchyPanel.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements the hierarchy panel for object selection, management (creation, deletion, duplication, ...) and camera selection.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 #include "HierarchyPanel.h"
 

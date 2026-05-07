@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Object.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines a scene object with a transform and a list of attached components.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -25,20 +34,18 @@ struct Object
     Object& operator=(const Object& other) = delete;
 
     template<typename T, typename... Args>
+    requires std::derived_from<T, IComponent>
     T& add_component(Args&&... args)
     {
-        static_assert(std::is_base_of_v<IComponent, T>, "[OBJECT: add_component]: T must be derived from IComponent");
-
         components.push_back(std::make_unique<T>(std::forward<Args>(args)...));
         return *static_cast<T*>(components.back().get());
     }
 
     // todo(ilja): this has no usage rn
     template<typename T>
+    requires std::derived_from<T, IComponent>
     T* get_component()
     {
-        static_assert(std::is_base_of_v<IComponent, T>, "[OBJECT: get_component]: T must be derived from IComponent");
-
         for (auto& c : components)
         {
             if (T* typed = dynamic_cast<T*>(c.get()))
@@ -48,6 +55,7 @@ struct Object
     }
     
     template<typename T>
+    requires std::derived_from<T, IComponent>
     const T* get_component() const
     {
         static_assert(std::is_base_of_v<IComponent, T>, "[OBJECT: get_component const]: T must be derived from IComponent");

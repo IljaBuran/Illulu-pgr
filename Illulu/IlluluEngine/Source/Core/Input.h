@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Input.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines keyboard and mouse input state tracking.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Common.h"
 
 struct Input

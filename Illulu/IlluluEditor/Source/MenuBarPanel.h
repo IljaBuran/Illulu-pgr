@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       MenuBarPanel.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the editor menu bar panel interface.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #pragma once
 
 #include "IEditorPanel.h"

@@ -1,12 +1,21 @@
 #pragma once
+
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       DirectionalLightComponent.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines a directional light component with color and intensity settings.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Common.h"
 
 #include "Scene/ILightComponent.h"
 
 struct DirectionalLightComponent : ILightComponent
 {
-	DirectionalLightComponent(const Color& color_     = Color(1.0f), 
-		                            f32    intensity_ = 1.0f)
+	DirectionalLightComponent(const Color& color_ = Color(1.0f), f32 intensity_ = 1.0f)
 		: ILightComponent(color_, intensity_) {}
 
 	ComponentKind get_component_kind() const override

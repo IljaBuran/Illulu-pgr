@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Input.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements keyboard and mouse input state tracking.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Input.h"
 #include "pch.h"
 

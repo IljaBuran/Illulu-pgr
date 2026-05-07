@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Scene.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements scene management, object updates, component serialization, and camera helpers.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 #include "Scene/Scene.h"
@@ -19,7 +28,9 @@
 #include "Scene/DistanceFogComponent.h"
 #include "Scene/OrbitingMovementComponent.h"
 #include "Scene/AnimatedTextureComponent.h"
+#include "Scene/FloatingTextureComponent.h"
 #include "Core/Debug.h"
+
 
 void Scene::add_model(Model&& model)
 {
@@ -300,9 +311,28 @@ void Scene::update(f32 dt)
             }
         }
     }
+
+    for (const ComponentRef& ref : cachedFloatingTex)
+    {
+        Object& obj = objects[ref.objectIdx];
+
+        FloatingTextureComponent* floating =
+            static_cast<FloatingTextureComponent*>(obj.components[ref.componentIdx].get());
+
+        if (!floating->playing)
+            continue;
+
+        floating->offset += floating->speed * dt;
+
+        if (floating->loop)
+        {
+            floating->offset.x = floating->offset.x - std::floor(floating->offset.x);
+            floating->offset.y = floating->offset.y - std::floor(floating->offset.y);
+        }
+    }
 }
 
-// todo(ilja): this will be slow for bigger scenes, just redo later in binary format
+// todo(ilja): this will be slow for bigger scenes, just redo later in binary format if feeling tuff
 void Scene::load_from_file(const std::string& path)
 {
     std::ifstream ifs(path);
@@ -541,6 +571,26 @@ void Scene::load_from_file(const std::string& path)
                     break;
                 }
 
+                case ComponentKind::FloatingTexture:
+                {
+                    glm::vec2 speed = {
+                        std::stof(lGet()),
+                        std::stof(lGet())
+                    };
+
+                    i32 playing = std::stoi(lGet());
+                    i32 loop = std::stoi(lGet());
+
+                    add_object_component<FloatingTextureComponent>(
+                        objectIdx,
+                        speed,
+                        static_cast<bool>(playing),
+                        static_cast<bool>(loop)
+                    );
+
+                    break;
+                }
+
                 default:
                     FATAL_CRASH("[SceneLoader]: Unsupported component kind");
                 }
@@ -755,6 +805,19 @@ void Scene::save_to_file(const std::string& path)
 
                     ofs << static_cast<i32>(anim->playing) << '\n';
                     ofs << static_cast<i32>(anim->loop) << '\n';
+
+                    break;
+                }
+
+                case ComponentKind::FloatingTexture:
+                {
+                    const auto* floating = static_cast<const FloatingTextureComponent*>(comp.get());
+
+                    ofs << floating->speed.x << ' '
+                        << floating->speed.y << '\n';
+
+                    ofs << static_cast<i32>(floating->playing) << '\n';
+                    ofs << static_cast<i32>(floating->loop) << '\n';
 
                     break;
                 }

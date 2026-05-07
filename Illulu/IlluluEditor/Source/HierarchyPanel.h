@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       HierarchyPanel.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the editor hierarchy panel for displaying and selecting scene objects.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #pragma once
 
 #include "IEditorPanel.h"

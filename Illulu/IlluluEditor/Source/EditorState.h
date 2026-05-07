@@ -1,4 +1,14 @@
 #pragma once
+
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       EditorState.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines shared editor UI state such as selected objects, modes, and debug view flags.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Common.h"
 
 struct EditorState

@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       SkyboxDrawable.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements cubemap loading, skybox drawing, and skybox OpenGL resource management.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 #include "Renderer/SkyboxDrawable.h"
 

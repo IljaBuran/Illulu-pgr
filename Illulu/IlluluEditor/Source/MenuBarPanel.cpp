@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       MenuBarPanel.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements the editor menu bar with file, view, custom function, and help actions.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 #include "MenuBarPanel.h"
 

@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Texture.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements helper functions for loading 2D textures and cubemap textures.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 #include "Renderer/Texture.h"

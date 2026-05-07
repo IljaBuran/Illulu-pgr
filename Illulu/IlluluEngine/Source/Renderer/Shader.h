@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Shader.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines an OpenGL shader wrapper for loading, compiling, linking, and using shader programs.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include <glad/glad.h>
 #include <vector>
 #include <numeric>

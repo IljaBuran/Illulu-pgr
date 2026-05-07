@@ -1,4 +1,14 @@
 #pragma once
+
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       AssetPanel.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the editor asset panel for importing, selecting, and spawning model assets.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "IEditorPanel.h"
 
 struct AssetPanel : public IEditorPanel

@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       SkyboxDrawable.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines a drawable skybox component using a cubemap texture.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Common.h"
 
 #include <array>

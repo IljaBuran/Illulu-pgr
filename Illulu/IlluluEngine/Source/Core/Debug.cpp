@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Debug.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements native Windows message box display and parent window handle setup.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 #include "Common.h"

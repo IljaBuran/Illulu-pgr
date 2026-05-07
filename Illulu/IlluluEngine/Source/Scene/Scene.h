@@ -1,12 +1,20 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Scene.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the scene structure, object storage, model storage, and component caches.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include <vector>
 #include <string>
 #include <array>
 #include <utility>
-#include <type_traits>
 #include <memory>
-#include <numeric>
+#include <concepts>
 
 #include "Scene/Object.h"
 #include "Scene/ICameraComponent.h"
@@ -16,6 +24,7 @@
 #include "Scene/CollisionBoxComponent.h"
 #include "Scene/OrbitingMovementComponent.h"
 #include "Scene/AnimatedTextureComponent.h"
+#include "Scene/FloatingTextureComponent.h"
 
 #include "Renderer/IDrawable.h"
 #include "Renderer/Model.h"
@@ -33,8 +42,9 @@ struct Scene
     std::vector<ComponentRef> cachedLights;
     std::vector<ComponentRef> cachedCollisionBoxes;
 
-    std::vector<ComponentRef> cachedOrbiting; // todo(ilja): ...
+    std::vector<ComponentRef> cachedOrbiting;
     std::vector<ComponentRef> cachedAnimatedTex;
+    std::vector<ComponentRef> cachedFloatingTex;
     
     std::vector<std::pair<std::string, std::string>> currentCollisions;
 
@@ -49,15 +59,15 @@ struct Scene
     void update_orbit_movement(f32 dt);
     void update_collisions();
     
+
+    // note(ilja): 2 add_object_component overloads, compile time check for valid IComponent parameter
     template<typename T, typename... Args>
+    requires std::derived_from<T, IComponent>
     T& add_object_component(u32 idx, Args&&... args)
     {
         if (idx >= objects.size())
             FATAL_CRASH("[SCENE: add_object_component]: invalid object index");
         
-        static_assert(std::is_base_of_v<IComponent, T>,
-            "[SCENE: add_object_component]: T must be derived from IComponent");
-
         objects[idx].components.push_back(std::make_unique<T>(std::forward<Args>(args)...));
 
         u32 compIdx = static_cast<u32>(objects[idx].components.size() - 1);
@@ -79,6 +89,9 @@ struct Scene
         
         if constexpr (std::is_base_of_v<AnimatedTextureComponent, T>)
             cachedAnimatedTex.emplace_back(ComponentRef{idx, compIdx});
+
+        if constexpr (std::is_base_of_v<FloatingTextureComponent, T>)
+            cachedFloatingTex.emplace_back(ComponentRef{ idx, compIdx });
 
         return *static_cast<T*>(objects[idx].components.back().get());
     }
@@ -113,6 +126,9 @@ struct Scene
 
         if (dynamic_cast<AnimatedTextureComponent*>(raw))
             cachedAnimatedTex.emplace_back(ComponentRef{idx, compIdx});
+
+        if (dynamic_cast<FloatingTextureComponent*>(raw))
+            cachedFloatingTex.emplace_back(ComponentRef{ idx, compIdx });
 
         return *raw;
     }
@@ -158,8 +174,13 @@ struct Scene
         {
             std::erase(cachedAnimatedTex, ComponentRef{objIdx, compIdx});
         }
+        if (dynamic_cast<FloatingTextureComponent*>(raw))
+        {
+            std::erase(cachedFloatingTex, ComponentRef{ objIdx, compIdx });
+        }
 
-        // note(ilja): repair invalidated cache structures
+        // note(ilja): naively repair invalidated cache structures
+            // this should be ok, as removing component is not as often
         for (auto& comp : cachedCameras)
             if (comp.objectIdx == objIdx)
                 if (comp.componentIdx > compIdx)
@@ -181,6 +202,10 @@ struct Scene
                 if (comp.componentIdx > compIdx)
                     comp.componentIdx--;
         for (auto& comp : cachedAnimatedTex)
+            if (comp.objectIdx == objIdx)
+                if (comp.componentIdx > compIdx)
+                    comp.componentIdx--;
+        for (auto& comp : cachedFloatingTex)
             if (comp.objectIdx == objIdx)
                 if (comp.componentIdx > compIdx)
                     comp.componentIdx--;

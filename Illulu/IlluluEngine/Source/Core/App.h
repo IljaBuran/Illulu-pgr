@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       App.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the main application class that owns core systems and controls the frame loop.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Common.h"
 #include "Core/AppContext.h"
 #include "Core/Window.h"

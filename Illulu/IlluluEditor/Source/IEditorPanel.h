@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       IEditorPanel.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the base interface for all editor panels.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #pragma once
 
 #include "Core/AppContext.h"

@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       InspectorPanel.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements the inspector panel for editing selected object transforms and components.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 #include "InspectorPanel.h"
 
@@ -19,6 +28,7 @@
 #include "Scene/DistanceFogComponent.h"
 #include "Scene/OrbitingMovementComponent.h"
 #include "Scene/AnimatedTextureComponent.h"
+#include "Scene/FloatingTextureComponent.h"
 
 void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 {
@@ -395,22 +405,6 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
                 if (cast->radius < 0.0f)
                     cast->radius = 0.0f;
 
-                ImGui::Separator();
-
-                if (cast->orbitingAxis == OrbitingAxis::Y)
-                {
-                    ImGui::TextDisabled("Y axis: orbit in XZ plane. Height controls Y offset.");
-                }
-                else if (cast->orbitingAxis == OrbitingAxis::X)
-                {
-                    ImGui::TextDisabled("X axis: orbit in YZ plane. Height controls X offset.");
-                }
-                else if (cast->orbitingAxis == OrbitingAxis::Z)
-                {
-                    ImGui::TextDisabled("Z axis: orbit in XY plane. Height controls Z offset.");
-                }
-
-                ImGui::TextDisabled("Speed and angle are in radians.");
 
                 ImGui::TreePop();
             }
@@ -472,7 +466,33 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
 
                 ImGui::TreePop();
             }
+        }
+        
+        else if (kind == ComponentKind::FloatingTexture)
+        {
+            const bool opened = ImGui::TreeNode("Floating Texture");
+
+            if (ImGui::BeginPopupContextItem("component_ctx"))
+            {
+                if (ImGui::MenuItem("Delete component"))
+                    deleteCompIdx = compIdx;
+
+                ImGui::EndPopup();
             }
+
+            if (opened)
+            {
+                FloatingTextureComponent* cast = static_cast<FloatingTextureComponent*>(comp.get());
+
+                ImGui::DragFloat2("Speed", &cast->speed.x, 0.001f, -10.0f, 10.0f, "%.4f");
+                ImGui::DragFloat2("Offset", &cast->offset.x, 0.001f, -100.0f, 100.0f, "%.4f");
+
+                ImGui::Checkbox("Playing", &cast->playing);
+                ImGui::Checkbox("Loop", &cast->loop);
+
+                ImGui::TreePop();
+            }
+}
 
         ImGui::PopID();
     }
@@ -504,7 +524,8 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             "SpotLight",
             "CollisionBox",
             "OrbitingMovement",
-            "AnimatedTexture"
+            "AnimatedTexture",
+            "FloatingTexture"
         };
 
         ImGui::Combo("Component", &selectedItem, items, IM_ARRAYSIZE(items));
@@ -556,6 +577,10 @@ void InspectorPanel::draw(AppContext& ctx, EditorState& state)
             else if (selectedKind == ComponentKind::AnimatedTexture)
             {
                 scene.add_object_component<AnimatedTextureComponent>(state.selectedObject);
+            }
+            else if (selectedKind == ComponentKind::FloatingTexture)
+            {
+                scene.add_object_component<FloatingTextureComponent>(state.selectedObject);
             }
 
             ImGui::CloseCurrentPopup();

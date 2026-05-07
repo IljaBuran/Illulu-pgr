@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       AnimatedTextureComponent.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines a texture animation component based on atlas frame switching.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Scene/IComponent.h"
 #include "Common.h"
 
@@ -17,18 +26,23 @@ struct AnimatedTextureComponent : IComponent
     bool playing;
     bool loop;
 
-    AnimatedTextureComponent(u32 columns_    = 1, 
-                             u32 rows_       = 1, 
-                             u32 frameCount_ = 1, 
-                             f32 frameTime_  = 0.1f,
-                             bool playing_   = true, 
-                             bool loop_      = true)
-        : columns(columns_), 
-          rows(rows_), 
-          frameCount(frameCount_), 
-          frameTime(frameTime_), 
-          playing(playing_), 
-          loop(loop_) {}
+    AnimatedTextureComponent(
+        u32 columns_    = 1,
+        u32 rows_       = 1,
+        u32 frameCount_ = 1,
+        f32 frameTime_  = 0.1f,
+        bool playing_   = true,
+        bool loop_      = true
+    )
+        : columns(columns_),
+          rows(rows_),
+          frameCount(frameCount_),
+          frameTime(frameTime_),
+          playing(playing_),
+          loop(loop_)
+    {     
+    }
+
 
     ComponentKind get_component_kind() const override
     {

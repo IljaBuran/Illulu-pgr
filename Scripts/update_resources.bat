@@ -29,5 +29,6 @@ set "SRC=%ROOT%\Resources"
 set "DST=%ROOT%\x64\%CONFIG%\Resources"
 
 robocopy "%SRC%" "%DST%" /E /XO /XX
+if %ERRORLEVEL% LSS 8 set ERRORLEVEL=0
 
 endlocal

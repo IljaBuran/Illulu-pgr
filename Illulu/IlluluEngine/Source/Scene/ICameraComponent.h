@@ -1,4 +1,14 @@
 #pragma once
+
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       ICameraComponent.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the base camera component interface with view direction and projection helpers.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "Scene/IComponent.h"
 
 #include "Common.h"
@@ -15,9 +25,11 @@ struct ICameraComponent : IComponent
     
     ICameraComponent() = default;
     
-    ICameraComponent(      f32        yaw_     = -90.0f, 
-                           f32        pitch_   = 0.0f, 
-                     const glm::vec3& worldUp_ = glm::vec3{0.0f, 1.0f, 0.0f})
+    ICameraComponent(
+        f32 yaw_                  = -90.0f, 
+        f32 pitch_                = 0.0f, 
+        const glm::vec3& worldUp_ = glm::vec3{0.0f, 1.0f, 0.0f}
+    )
         :  yaw(yaw_), 
            pitch(pitch_), 
            worldUp(worldUp_) {}
@@ -26,7 +38,7 @@ struct ICameraComponent : IComponent
 
     glm::vec3 get_front() const
     {
-        glm::vec3 front;
+        glm::vec3 front{};
         front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
         front.y = sin(glm::radians(pitch));
         front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));

@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       App.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements application initialization, frame loop control, timing, rendering, and scene loading.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 #include <algorithm>

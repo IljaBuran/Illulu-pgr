@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Mesh.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements OpenGL mesh creation, drawing, move ownership, and resource cleanup.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 #include "Common.h"

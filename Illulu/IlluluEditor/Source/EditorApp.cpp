@@ -1,3 +1,13 @@
+
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       EditorApp.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements editor initialization, main loop, ImGui rendering, camera controls, picking, and scene interactions.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 #include "EditorApp.h"
 
@@ -171,6 +181,18 @@ void EditorApp::update(f32 deltaTime)
     if (scene.currentCamera.objectIdx >= scene.objects.size())
         return;
 
+    if (input.is_key_pressed(GLFW_KEY_P) && !state->editMode)
+    {
+        scene.currentCamera = { 1, 0 };
+    }
+    if (input.is_key_pressed(GLFW_KEY_O) && !state->editMode)
+    {
+        scene.currentCamera = { 60, 0 };
+    }
+    if (input.is_key_pressed(GLFW_KEY_I) && !state->editMode)
+    {
+        scene.currentCamera = { 42, 0 };
+    }
     Object& camObj = scene.objects[scene.currentCamera.objectIdx];
 
     if (scene.currentCamera.componentIdx >= camObj.components.size())

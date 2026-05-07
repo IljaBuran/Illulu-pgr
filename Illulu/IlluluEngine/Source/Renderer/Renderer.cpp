@@ -1,29 +1,38 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Renderer.cpp
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Implements scene rendering, shader setup, lighting upload, debug drawing, and object picking.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 #include "Common.h"
-
 #include "Renderer/Renderer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <cmath>
 
-#include "Scene/Object.h"
-#include "Scene/Scene.h"
 #include "Renderer/Model.h"
 #include "Renderer/ModelDrawable.h"
 #include "Renderer/Mesh.h"
 #include "Renderer/IDrawable.h"
 
 #include "glad/glad.h"
+
+#include "Scene/Object.h"
+#include "Scene/Scene.h"
 #include "Scene/ICameraComponent.h"
 #include "Scene/DirectionalLightComponent.h"
 #include "Scene/PointLightComponent.h"
 #include "Scene/SpotLightComponent.h"
 #include "Scene/DistanceFogComponent.h"
 #include "Scene/AnimatedTextureComponent.h"
-#include <cmath>
+#include "Scene/FloatingTextureComponent.h"
 
-// todo(ilja): ...
 void Renderer::init_debug_cube()
 {
     constexpr f32 vertices[] =
@@ -168,6 +177,9 @@ void Renderer::init()
     handles.atlasRows = basicShader.get_uniform_location("atlasRows");
     handles.atlasFrame = basicShader.get_uniform_location("atlasFrame");
 
+    handles.useFloatingTexture = basicShader.get_uniform_location("useFloatingTexture");
+    handles.floatingTextureOffset = basicShader.get_uniform_location("floatingTextureOffset");
+
     handles.fogMode = basicShader.get_uniform_location("fogMode");
     handles.fogColor = basicShader.get_uniform_location("fogColor");
     handles.fogStart = basicShader.get_uniform_location("fogStart");
@@ -253,7 +265,6 @@ void Renderer::init()
 
     init_debug_cube();
 
-
     pickingShader.load_shader_from_source("Resources/Shaders/Picking.vert", GL_VERTEX_SHADER);
     pickingShader.load_shader_from_source("Resources/Shaders/Picking.frag", GL_FRAGMENT_SHADER);
     pickingShader.create_and_link_program();
@@ -321,13 +332,13 @@ void Renderer::begin_frame()
 
     glm::vec3 dir;
     glm::vec3 col;
-    f32 intens = 1.0f;
+    f32 intensity = 1.0f;
 
-    if (get_directional_light(dir, col, intens))
+    if (get_directional_light(dir, col, intensity))
     {
         glUniform3fv(handles.dirLightDirection, 1, glm::value_ptr(dir));
         glUniform3fv(handles.dirLightColor, 1, glm::value_ptr(col));
-        glUniform1f(handles.dirLightIntensity, intens);
+        glUniform1f(handles.dirLightIntensity, intensity);
     }
     else // note(ilja): i'll just make default one as fallback if there doesn't exist any direcitonal light
     {
@@ -426,13 +437,18 @@ void Renderer::draw()
         glUniform3fv(handles.color, 1, glm::value_ptr(item.color));
 
         // todo(ilja): ineffective, but ok for now
-        const AnimatedTextureComponent* anim = item.object->get_component<AnimatedTextureComponent>();
-        if (anim && anim->columns > 0 && anim->rows > 0 && anim->frameCount > 1)
+        const AnimatedTextureComponent* animTex =
+            item.object->get_component<AnimatedTextureComponent>();
+
+        const FloatingTextureComponent* floatTex =
+            item.object->get_component<FloatingTextureComponent>();
+
+        if (animTex && animTex->columns > 0 && animTex->rows > 0 && animTex->frameCount > 1)
         {
             glUniform1i(handles.useTextureAtlas, 1);
-            glUniform1i(handles.atlasColumns, anim->columns);
-            glUniform1i(handles.atlasRows, anim->rows);
-            glUniform1i(handles.atlasFrame, anim->currentFrame);
+            glUniform1i(handles.atlasColumns, animTex->columns);
+            glUniform1i(handles.atlasRows, animTex->rows);
+            glUniform1i(handles.atlasFrame, animTex->currentFrame);
         }
         else
         {
@@ -440,6 +456,19 @@ void Renderer::draw()
             glUniform1i(handles.atlasColumns, 1);
             glUniform1i(handles.atlasRows, 1);
             glUniform1i(handles.atlasFrame, 0);
+        }
+
+        if (floatTex)
+        {
+            glUniform1i(handles.useFloatingTexture, 1);
+            glUniform2fv(handles.floatingTextureOffset, 1, glm::value_ptr(floatTex->offset));
+        }
+        else
+        {
+            glUniform1i(handles.useFloatingTexture, 0);
+
+            glm::vec2 zeroOffset(0.0f, 0.0f);
+            glUniform2fv(handles.floatingTextureOffset, 1, glm::value_ptr(zeroOffset));
         }
 
         apply_material(item.mesh->material);
@@ -480,6 +509,7 @@ void Renderer::draw()
     if (showCollisionBoxes)
         draw_collision_boxes();
 }
+
 
 void Renderer::end_frame()
 {}
@@ -672,7 +702,10 @@ f32 Renderer::get_aspect_ratio() const
 {
     f32 res = static_cast<f32>(appContext->pWindow->width) / static_cast<f32>(appContext->pWindow->height);
     // note(ilja): this might sometimes be nan, for example after returning from minimized windows (minimized window -> framebuffer 0x0)
-    return std::isnan(res) ? 16.0f / 9.0f : res;
+    if (!std::isnan(res)) [[likely]]
+        return res;
+    else [[unlikely]]
+        return 16.0f / 9.0f;
 }
 
 glm::mat4 Renderer::build_model_matrix(const Transform& transform) const

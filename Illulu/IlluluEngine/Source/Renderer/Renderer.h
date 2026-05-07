@@ -1,5 +1,15 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Renderer.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the renderer, render items, shader handles, and rendering helper functions.
+ */
+ //-----------------------------------------------------------------------------------------
+
+
 #include "Common.h"
 
 #include "glm/mat4x4.hpp"
@@ -17,6 +27,9 @@
 
 using Color = glm::vec3;
 
+/**
+ * \brief Stores all data needed to render one mesh instance.
+ */
 struct RenderItem
 {
     const Mesh* mesh = nullptr;
@@ -27,8 +40,8 @@ struct RenderItem
     f32 distanceToCamera = 0.0f;
 };
 
-static constexpr i32 MAX_POINT_LIGHTS = 16;
-static constexpr i32 MAX_SPOT_LIGHTS = 16;
+static constexpr i32 MAX_POINT_LIGHTS = 20;
+static constexpr i32 MAX_SPOT_LIGHTS = 20;
 
 struct RendererHandles
 {
@@ -55,6 +68,9 @@ struct RendererHandles
     i32 atlasColumns = -1;
     i32 atlasRows = -1;
     i32 atlasFrame = -1;
+
+    i32 useFloatingTexture = -1;
+    i32 floatingTextureOffset = -1;
 
     i32 fogMode = -1;
     i32 fogColor = -1;

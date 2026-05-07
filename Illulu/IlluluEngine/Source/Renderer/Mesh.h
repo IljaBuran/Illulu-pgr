@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       Mesh.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines a mesh wrapper for OpenGL vertex/index buffers and material data.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #pragma once
 
 #include "Common.h"

@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       IDrawable.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the base interface for drawable scene components.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #pragma once
 
 #include "Scene/IComponent.h"

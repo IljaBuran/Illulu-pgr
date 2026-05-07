@@ -1,5 +1,14 @@
 #pragma once
 
+//-----------------------------------------------------------------------------------------
+/**
+ * \file       EditorApp.h
+ * \author     Ilja Buran
+ * \date       2025/05/07
+ * \brief      Defines the editor application wrapper that connects the engine with editor UI panels.
+ */
+ //-----------------------------------------------------------------------------------------
+
 #include <memory>
 
 #include "Common.h"
